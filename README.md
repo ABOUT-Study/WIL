@@ -6,7 +6,7 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 
 # 목차
 ### 2021-09-26
-[Docker란?](https://github.com/ABOUT-Study/WIL/blob/main/2021-09-26.md#1. Docker)
+[Docker란?](https://github.com/ABOUT-Study/WIL/blob/main/2021-09-26.md#1.Docker)
 
 
 
