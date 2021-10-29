@@ -21,9 +21,12 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 - [어댑터 패턴](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-17.md#5)
 - [Forward Proxy 서버](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-17.md#6)
 
-## 2021-10-24
-- [아키텍쳐 기본](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-24.md#1)
-- [좋은 아키텍쳐의 기준은?](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-24.md#2)
-- [문자열 인코딩, 문자 셋, 유니코드, ASCII](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-24.md#3)
+## 2021-10-31
+- [MySQL Explain 분석](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-31.md#1)
+- [인덱스](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-31.md#2)
+- [스트림](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-31.md#3)
+- [아키텍쳐 기본](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-31.md#4)
+- [좋은 아키텍쳐의 기준은?](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-31.md#5)
+- [문자열 인코딩, 문자 셋, 유니코드, ASCII](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-31.md#6)
 
 
