@@ -1,0 +1,131 @@
+
+# 1
+# MySQL Explain 분석
+복잡한 쿼리의 속도 개선을 위해 MySQL에서는 select 앞에 Explain을 추가 후 쿼리를 실행하면
+실행계획이 나온다. mysqlworkbench로 사용해 본다면 그림으로도 실행계획을 볼 수 있다.
+실행계획을 통해 나오는 데이터는 분석 방법이 필요해서 정리한다.
+
+  1. MySQL Explain 속성
+  |속성|설명|
+  |---|---|
+  |id|select 아이디로 SELECT를 구분하는 번호|
+  |table|참조하는 테이블|
+  |select_type|select에 대한 타입|
+  |type|조인 혹은 조회 타입|
+  |possible_keys|데이터를 조회할 때 DB에서 사용할 수 있는 인덱스 리스트|
+  |key|실제로 사용할 인덱스|
+  |key_len|실제로 사용할 인덱스의 길이|
+  |ref	Key|안의 인덱스와 비교하는 컬럼(상수)|
+  |rows|쿼리 실행 시 조사하는 행 수립|
+  |extra|추가 정보|
+
+
+  2. type **( 부가 설명 )**
+  |구분|설명|
+  |system	테이블에 단 한개의 데이터만 있는 경우
+  |const|SELECT에서 Primary Key 혹은 Unique Key를 살수로 조회하는 경우로 많아야 한 건의 데이터만 있음|
+  |eq_ref|조인을 할 때 Primary Key|
+  |ref|조인을 할 때 Primary Key 혹은 Unique Key가 아닌 Key로 매칭하는 경우|
+  |ref_or_null|ref 와 같지만 null 이 추가되어 검색되는 경우|
+  |index_merge|두 개의 인덱스가 병합되어 검색이 이루어지는 경우|
+  |unique_subquery|다음과 같이 IN 절 안의 서브쿼리에서 Primary Key가 오는 특수한 경우|
+  SELECT *
+  FROM tab01
+  WHERE col01 IN (SELECT Primary Key FROM tab01);|
+  |index_subquery|unique_subquery와 비슷하나 Primary Key가 아닌 인덱스인 경우
+  SELECT *
+  FROM tab01
+  WHERE col01 IN (SELECT key01 FROM tab02);|
+  |range|특정 범위 내에서 인덱스를 사용하여 원하는 데이터를 추출하는 경우로, 데이터가 방대하지 않다면 단순 SELECT 에서는 나쁘지 않음|
+  |index|인덱스를 처음부터 끝까지 찾아서 검색하는 경우로, 일반적으로 인덱스 풀스캔이라고 함|
+  |all|테이블을 처음부터 끝까지 검색하는 경우로, 일반적으로 테이블 풀스캔이라고 함|
+
+
+  3. extra **( 부가 설명 )**
+  |구분|설명|
+  |using index|커버링 인덱스라고 하며 인덱스 자료 구조를 이용해서 데이터를 추출|
+  |using where|where 조건으로 데이터를 추출. type이 ALL 혹은 Indx 타입과 함께 표현되면 성능이 좋지 않다는 의미|
+  |using filesort|데이터 정렬이 필요한 경우로 메모리 혹은 디스크상에서의 정렬을 모두 포함. 결과 데이터가 많은 경우 성능에 직접적인 영향을 줌|
+  |using temporary|쿼리 처리 시 내부적으로 temporary table이 사용되는 경우를 의미함|
+
+  [출처] https://nomadlee.com/mysql-explain-sql/
+  [출처] https://coding-factory.tistory.com/744?category=990785
+
+# 2
+# 인덱스
+색인, 지표, 지수 등을 뜻하는 영단어.
+데이터베이스 분야에 있어서 테이블에 대한 동작의 속도를 높여주는 자료 구조를 일컫는다.
+인덱스의 저장공간은 저장된 데이터의 10%가 필요하다고 한다.
+인덱스의 순서에 따라 다르게 적용된다.
+
+  1. 클러스터 인덱스 (Clustered Index)
+    - 테이블 당 1개만 존재
+    - PK 제약조건으로 컬럼을 생성하면 자동 생성
+    - 인덱스에 데이터와 페이지가 함께 존재
+    - 리프 페이지 == 데이터 페이지
+    - 데이터가 정렬된 상태
+
+  2. 넌클러스터 인덱스 (Non-Clustered Index)
+    - Secondary Index (보조 인덱스)라고도 함
+    - 테이블에 여러개가 존재할 수 있음
+    - Unique 제약조건으로 컬럼을 생성하면 자동 생성
+    - 인덱스와 데이터 페이지가 따로 존재
+    - 리프 페이지에서 데이터가 있는곳의 주소를 알려줌
+    - 데이터 페이지에 데이터가 정렬되어 있지 않아도 됨
+    - Clustered Index와 비교해서 조회속도가 살짝 느림
+    - Clustered Index와 비교해서 insert / update /delete 부하 적음
+
+  3. Clustered Index vs Non-Clustered Index
+    - 쿼리 실행 전 읽혀진 페이지 숫자 (show global status like 'Innodb_pages_read')
+    - Select where 쿼리 실행 (select * from table_name where id = 10000)
+    - 쿼리 실행 후 읽혀진 페이지 숫자 (show global status like 'Innodb_pages_read')
+    (쿼리 실행 후 읽혀진 페이지 숫자 - 쿼리 실행 전 읽혀진 페이지 숫자 = 쿼리 실행으로 읽은 페이지 숫자)
+
+[출처] https://mangkyu.tistory.com/96
+[출처] https://www.youtube.com/watch?v=P5SZaTQnVCA
+
+# 3
+# 스트림
+스트림이란 '데이터 처리 연산을 지원하도록 소스에서 추출된 연속된 요소'로 정의할 수 있다.
+스트림은 내부반복 일반적으로 사용하는 for-each는 외부 반복이다.
+
+- 연속된 요소 : 컬렉션에서는 ArrayList, LinkedList와 같은 시간과 공간의 복잡성과 관련된 요소 저장 및 접근 연산이 주를 이룬다.
+  반면 스트림은 filter, sorted, map처럼 표현 계산식이 주를 이룬다.
+- 소스: 정렬을 시킨 데이터를 스트림에 넣으면 그대로 같은 순서를 유지한다.
+- 데이터 처리 연산 : filter, map, reduce, find등으로 데이터를 조작할 수 있다.
+
+  1. 중간연산
+    * filter, distinct, limit는 스트림을 반환하며 서로 연결할 수 있다. 이들을 중간연산이라 한다.
+
+    - 실행
+    List<String> names =
+      Menu.stream()
+      .filter(dish -> {
+          System.out.println("filtering:" + dish.getName());
+          return dish.getCalories() > 300;
+      }) // 필터링한 요리명을 출력한다.
+      .map(dish -> {
+        System.out.println("mapping:" + dish.getName());
+        return dish.getName();
+      }) // 추출한 요리명을 출력한다.
+      .limit(3)
+      .collect(toList());
+    System.out.println(names);
+
+    - 결과
+    filtering:pork
+    mapping:pork
+    filtering:beef
+    mapping:beef
+    filtering:chicken
+    mapping:chicken
+    [pork, beef, chicken]
+
+    - 해석
+    스트림은 lazy연산을 진행한다. 즉 직접 실행되기 전까지는 아무것도 수행을 하지 않는다.
+    첫번째에서 300칼로리가 넘는 요리는 여러 개지만 오직 처음 3개만 선택된다.
+    이는 limit 연산 그리고 **(쇼트서킷)** 이라 불리는 기법 덕분이다.
+    둘번째로 filter와 map은 서로 다른연산이지만 한과정으로 병합되었다. 이를 **(루프퓨전)** 이라고 한다.
+
+  2. 최종연산
+    * count()는 스트림이 아닌 long을 반환한다. 즉 count()는 최종연산이라 한다.
