@@ -32,5 +32,14 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 - [부하테스트와 스트레스 테스트](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-31.md#8)
 - [DataBase 분산기법](https://github.com/ABOUT-Study/WIL/blob/main/2021-10-31.md#9)
 
-
+## 2021-11-14
+- [inner join VS EXISTS](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#1)
+- [Lombok 사용시 주의점](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#2)
+- [가비지 컬렉션](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#4)
+- [영속성 컨텍스트 특징](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#5)
+- [가상 메모리란?](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#6)
+- [데드락(Deadlook)](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#7)
+- [Fly Way](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#8)
+- [Swagger-UI](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#9)
+- [@JsonNaming, @JsonProperty](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#10)
 
