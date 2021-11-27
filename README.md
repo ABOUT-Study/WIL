@@ -43,3 +43,13 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 - [Swagger-UI](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#9)
 - [@JsonNaming, @JsonProperty](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-14.md#10)
 
+## 2021-11-27
+- [CI/CD란?](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#1)
+- [프로그램의 실행, 주소 바인딩](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#2)
+- [트랜잭션](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#3)
+- [스케줄러](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#4)
+- [배치](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#5)
+- [쇼트서킷](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#6)
+- [CORS](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#7)
+- [Pagehelper 라이브러리](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#8)
+- [사용자 정의 예외](https://github.com/ABOUT-Study/WIL/blob/main/2021-11-27.md#9)
