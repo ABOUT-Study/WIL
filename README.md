@@ -6,6 +6,18 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 
 # 인덱스
 
+## 2022-01-02
+- [클러스터링 vs 리플리케이션 vs 샤딩] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#1)
+- [JWT vs 세션] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#2)
+- [해쉬테이블] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#3)
+- [LocalDateTime] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#4)
+- [Server To Server] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#5)
+- [truncate vs delete] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#6)
+- [암호화 알고리즘] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#7)
+- [@Scheduled 어노테이션] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#8)
+- [Primary Key 와 Unique Key 의 상관 관계] (https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#9)
+
+
 ## 2021-12-05
 - [reactive streams란?](https://github.com/ABOUT-Study/WIL/blob/main/2021-12-05.md#1)
 - [Webflux 란?](https://github.com/ABOUT-Study/WIL/blob/main/2021-12-05.md#2)
