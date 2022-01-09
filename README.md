@@ -6,6 +6,20 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 
 # 인덱스
 
+## 2022-01-09
+- [Stream 의 병렬 처리](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#1)
+- [포크/조인 프레임워크](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#2)
+- [자바의 동시성 이슈](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#3)
+- [atomic type](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#4)
+- [CAS (Compare And Swap) 알고리즘](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#5)
+- [HTTPS가 HTTP보다 좋은 이유?](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#7)
+- [Spring Bean Scope](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#8)
+- [문맥교환(Context Switching)](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#9)
+- [변수 명의 표기 종류](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#10)
+- [Optional 클래스 (java.util.Optional 클래스)](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#11)
+- [With 절 구문](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-09.md#12)
+
+
 ## 2022-01-02
 - [클러스터링 vs 리플리케이션 vs 샤딩](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#1)
 - [JWT vs 세션](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-02.md#2)
