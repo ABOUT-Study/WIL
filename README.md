@@ -6,6 +6,12 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 
 # 인덱스
 
+## 2022-02-07
+- [수많은 요청이 들어왔을 경우 처리 방법](https://github.com/ABOUT-Study/WIL/blob/main/2022-02-07.md#1)
+- [대용량 엑셀다운로드 처리](https://github.com/ABOUT-Study/WIL/blob/main/2022-02-07.md#2)
+- [대용량 트래픽처리(세션의 불일치)](https://github.com/ABOUT-Study/WIL/blob/main/2022-02-07.md#3)
+
+
 ## 2022-01-30
 - [스레드 풀의 적절한 사이즈는?](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-30.md#1)
 - [페이징 성능 개선하기 - No Offset 사용하기(더보기 방식)](https://github.com/ABOUT-Study/WIL/blob/main/2022-01-30.md#2)
