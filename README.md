@@ -1,6 +1,5 @@
-# WIL
-스터디원들이 일주일동안 각자 습득하거나 공부한 내용을 정리하는 공간입니다. 
-Weekend I Learned
+# WIL(Weekend I Learned)
+스터디원들이 일주일동안 각자 습득하거나 공부한 내용을 정리하는 공간입니다.    
 
 # 마크다운 명령어 사용 방법(매우쉬움)
 https://gist.github.com/ihoneymon/652be052a0727ad59601
