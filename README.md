@@ -1,10 +1,22 @@
 # WIL
+스터디원들이 일주일동안 각자 습득하거나 공부한 내용을 정리하는 공간입니다. 
 Weekend I Learned
 
 # 마크다운 명령어 사용 방법(매우쉬움)
 https://gist.github.com/ihoneymon/652be052a0727ad59601
 
 # 인덱스
+
+## 2022-03-06
+- [@Transactional 어노테이션](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#1)
+- [UnaryOperator, default 메서드](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#2)
+- [hikariCP](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#3)
+- [시맨틱 웹, 온톨로지](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#4)
+- [RDF (Resource Description Framework)](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#5)
+- [DCAT(Data Catalog Vocabulary)](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#6)
+- [즉시로딩(Eager Loading) VS 지연로딩(Lazy Loading)](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#7)
+- [JPA N+1](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#8)
+- [DTO vs DAO](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#9)
 
 ## 2022-02-20
 - [Jetty](https://github.com/ABOUT-Study/WIL/blob/main/2022-02-20.md#1)
