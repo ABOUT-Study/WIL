@@ -7,12 +7,12 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 # 인덱스
 
 ## 2022-03-20
-- [대규모 데이터 처리의 어려운점] (https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#1)
-- [대규모 조정의 요소(CPU부하와 I/O부하)] (https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#2)
-- [enum의 활용] (https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#3)
-- [KAFKA] (https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#4)
-- [@Async] (https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#5)
-- [대규모 데이터를 다루기 위한 기초지식] (https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#6)
+- [대규모 데이터 처리의 어려운점](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#1)
+- [대규모 조정의 요소(CPU부하와 I/O부하)](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#2)
+- [enum의 활용](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#3)
+- [KAFKA](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#4)
+- [@Async](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#5)
+- [대규모 데이터를 다루기 위한 기초지식](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#6)
 
 ## 2022-03-06
 - [@Transactional 어노테이션](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-06.md#1)
