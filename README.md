@@ -6,6 +6,11 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 
 # 인덱스
 
+## 2022-04-03
+- [Git rebase와 merge](https://github.com/ABOUT-Study/WIL/blob/main/2022-04-03.md#1)
+- [예외처리(Exception)](https://github.com/ABOUT-Study/WIL/blob/main/2022-04-03.md#2)
+- [I/O 부하를 줄이는 방법](https://github.com/ABOUT-Study/WIL/blob/main/2022-04-03.md#3)
+
 ## 2022-03-27
 - [Spring Proxy](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-27.md#1)
 - [Transactional Async](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-27.md#2)
