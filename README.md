@@ -6,6 +6,12 @@ https://gist.github.com/ihoneymon/652be052a0727ad59601
 
 # 인덱스
 
+## 2022-03-27
+- [Spring Proxy](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-27.md#1)
+- [Transactional Async](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-27.md#2)
+- [OS의 캐시 구조](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-27.md#3)
+- [API 통신시 보안 이슈](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-27.md#4)
+
 ## 2022-03-20
 - [대규모 데이터 처리의 어려운점](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#1)
 - [대규모 조정의 요소(CPU부하와 I/O부하)](https://github.com/ABOUT-Study/WIL/blob/main/2022-03-20.md#2)
