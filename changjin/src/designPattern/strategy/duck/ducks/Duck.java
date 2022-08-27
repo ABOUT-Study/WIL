@@ -1,4 +1,7 @@
-package designPattern.strategy.duck;
+package designPattern.strategy.duck.ducks;
+
+import designPattern.strategy.duck.FlyBehavior;
+import designPattern.strategy.duck.QuackBehavior;
 
 public abstract class Duck {
 
@@ -7,6 +10,14 @@ public abstract class Duck {
 
     public void swim() {
         System.out.println("수영하기");
+    }
+
+    public void setFlyBehavior(FlyBehavior flyBehavior) {
+        this.flyBehavior = flyBehavior;
+    }
+
+    public void setQuackBehavior(QuackBehavior quackBehavior) {
+        this.quackBehavior = quackBehavior;
     }
 
     public abstract void display();

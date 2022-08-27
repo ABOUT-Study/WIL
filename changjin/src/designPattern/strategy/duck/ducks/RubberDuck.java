@@ -1,4 +1,7 @@
-package designPattern.strategy.duck;
+package designPattern.strategy.duck.ducks;
+
+import designPattern.strategy.duck.FlyNoWay;
+import designPattern.strategy.duck.MuteQuack;
 
 public class RubberDuck extends Duck {
 

@@ -1,4 +1,7 @@
-package designPattern.strategy.duck;
+package designPattern.strategy.duck.ducks;
+
+import designPattern.strategy.duck.FlyWithWings;
+import designPattern.strategy.duck.Quack;
 
 public class ReadHeadDuck extends Duck {
 
