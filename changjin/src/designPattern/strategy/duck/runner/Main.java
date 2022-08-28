@@ -1,10 +1,7 @@
 package designPattern.strategy.duck.runner;
 
 import designPattern.strategy.duck.*;
-import designPattern.strategy.duck.ducks.Duck;
-import designPattern.strategy.duck.ducks.ModelDuck;
-import designPattern.strategy.duck.ducks.ReadHeadDuck;
-import designPattern.strategy.duck.ducks.RubberDuck;
+import designPattern.strategy.duck.ducks.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,6 +13,13 @@ public class Main {
         Duck rubberDuck = new RubberDuck();
         rubberDuck.perfomeFly();
         rubberDuck.perfomeQuack();
+
+        Duck myDuck = new MyDuck();
+        myDuck.setFlyBehavior(new FlyRocketPowered());
+        myDuck.setQuackBehavior(new MuteQuack());
+
+        myDuck.perfomeFly();
+        myDuck.perfomeQuack();
 
         Duck modelDuck = new ModelDuck();
         modelDuck.setFlyBehavior(new FlyRocketPowered());
