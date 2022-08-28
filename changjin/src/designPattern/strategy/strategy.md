@@ -48,7 +48,11 @@
  4. Duck 클래스(또는 그 서브클래스)를 생성할 때 생성자 메소드로 FlyBehavior, QuackBehavior에 행동을 결정하는 구현 클래스를 대입한다. 
  5. Duck rubberDuck = new RubberDuck() 를 했을 때 생성자에 의해 Duck 클래스의 FlyBehavior 에 FlyNoway, QuackBehavior 에 MuteQuack이 대입되었다. 이로써 참조변수 Duck으로 perfomeFly를 사용하면서 다른 동작을 할 수 있게 된다.
 
-### 4. 결론
+### 4. 기본 설계
+
+![img.png](img.png)
+
+### 5. 결론
 
  1. A is B (상속) 보다 A has B (인터페이스) 가 나을 수 있다.
  2. 런타임 의존성과 컴파일 의존성의 차이를 이해하고, 결합도가 낮은 컴파일 의존성을 사용하도록 하자.
