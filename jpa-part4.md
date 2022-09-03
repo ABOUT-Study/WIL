@@ -37,8 +37,8 @@
     
 ## 4. 필드와 컬럼 매핑
 - @Column : 객체 필드를 테이블 컬럼에 매핑
-  - @Column을 생략하면 자바 기본 타입(int,double)일때는 not null, 객체 타입(Integer)일때는 nullable 속성 자동 정의
-  - 하지만 @Column을 사용할때는 nullable = true 가 기본이므로, nullable = false 라고 지정하는 것이 안전.
+  - @Column을 생략하면 필드의 자바 기본 타입(int,double)일때는 not null, 객체 타입(Integer)일때는 nullable 속성 자동 정의
+  - 하지만 @Column을 사용할때는 디폴트 값이 nullable = true이므로, 명시적으로 nullable = false 라고 지정하는 것이 안전.
 
 - @Enumerated : eunm 타입을 매핑할 때 사용
   - EnumType.ORDINAML(enum 순서) 와 EnumType.STRING(enum 이름) 중에 하나를 사용한다.
