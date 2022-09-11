@@ -1,4 +1,4 @@
-package designPattern.strategy.prevUseInterface.runner;
+package designPattern.strategy.prevUseInterface;
 
 import designPattern.strategy.prevUseInterface.Duck;
 import designPattern.strategy.prevUseInterface.Flyable;

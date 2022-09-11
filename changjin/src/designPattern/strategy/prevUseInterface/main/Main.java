@@ -1,6 +1,7 @@
-package designPattern.strategy.prevUseInterface.runner;
+package designPattern.strategy.prevUseInterface.main;
 
 import designPattern.strategy.prevUseInterface.Duck;
+import designPattern.strategy.prevUseInterface.MallardDuck;
 import designPattern.strategy.prevUseInterface.RubberDuck;
 
 public class Main {

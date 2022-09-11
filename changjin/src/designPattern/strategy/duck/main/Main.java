@@ -1,4 +1,4 @@
-package designPattern.strategy.duck.runner;
+package designPattern.strategy.duck.main;
 
 import designPattern.strategy.duck.*;
 import designPattern.strategy.duck.ducks.*;
