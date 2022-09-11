@@ -11,6 +11,8 @@ public class WeatherStation {
         CurrentConditionDisplayKR currentConditionDisplayKR = new CurrentConditionDisplayKR(weatherData);
         CurrentConditionDisplay currentConditionDisplay = new CurrentConditionDisplay(weatherData);
 
+        weatherData.removeObserver(currentConditionDisplay);
+
         weatherData.setMeasurements(80, 65, 30.4f);
         weatherData.setMeasurements(82, 70, 29.2f);
     }

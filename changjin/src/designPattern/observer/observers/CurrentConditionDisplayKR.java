@@ -10,7 +10,7 @@ public class CurrentConditionDisplayKR implements Observer, DisplayElement {
     private float humidity;
     public Subject weatherData;
 
-    public CurrentConditionDisplayKR(Subject weatherData) {
+    public CurrentConditionDisplayKR(Subject weatherData) { // 생성자 메소드에서 주제 객체에 옵저버를 추가한다.
         this.weatherData = weatherData;
         weatherData.registerObserver(this);
     }

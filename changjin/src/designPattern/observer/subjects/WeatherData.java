@@ -8,7 +8,7 @@ import java.util.List;
 
 public class WeatherData implements Subject {
 
-    public List<designPattern.observer.Observer> observers;
+    public List<Observer> observers;
     private float temperature;
     private float humidity;
     private float pressure;
@@ -31,12 +31,19 @@ public class WeatherData implements Subject {
     }
 
     @Override
-    public void notifyObserver() {
-        for (int i = 0; i < observers.size(); i++) {
-            Observer observer = observers.get(i);
-            observer.update(temperature, humidity, pressure);
+    public void notifyObserver() { // 이벤트 발생시 옵저버들에게 변경을 알린다. 푸시 기반으로 동작한다.
+        for (Observer observer : observers) {
+            observer.update(this.temperature, this.humidity, this.pressure);
         }
     }
+
+    // 풀 방식
+//    @Override
+//    public void notifyObserver() {
+//        for (Observer observer : observers) {
+//            observer.update();
+//        }
+//    }
 
     public void measurementsChanged() {
         notifyObserver();
@@ -47,5 +54,17 @@ public class WeatherData implements Subject {
         this.humidity = humidity;
         this.pressure = pressure;
         measurementsChanged();
+    }
+
+    public float getTemperature() {
+        return temperature;
+    }
+
+    public float getHumidity() {
+        return humidity;
+    }
+
+    public float getPressure() {
+        return pressure;
     }
 }
