@@ -7,7 +7,7 @@ em.find() : 데이터베이스를 통해서 실제 엔티티 객체 조회
 - ***테이블을 조회해서 객체를 가져올 때 연관관계 객체를 안가져오고싶을때 어떻게 해야할까?***
  ---
 
-## 프록시
+# 프록시
 ```
 em.getReference() : 데이터 베이스 조회를 미루는 프록시 엔티티 객체 조회
 ```
@@ -49,3 +49,49 @@ member.getName();//(2)-
 - (2) getName()을 하면 JPA가 영속성 컨텐스트에 초기화 요청을 한다.
 - (3) 영속성 컨텍스트에서는 실제 db를 조회해서 가져온 다음 실제 Entity에 값을 넣어 생성한 다음, 프록시 객체와 실제 엔티티를 연결해서 실제 엔티티를 반환한다.
 - 그 이후에는 이미 초기화 되어있는 프록시 객체이기에 해당 엔티티를 반환한다.
+
+---
+
+# 즉시로딩과 지연로딩
+- 다시 돌아와서 Member 엔티티를 조회할때 연관된 Team은 조회하지않고, member 정보만 조회하는 방법은 프록시를 활용하면 된다.
+### 지연로딩
+- 지연로딩 fetch = FetchType.LAZY를 사용해서 프록시로 조회
+```
+/*Member*/
+@Entity
+public class Member{
+	
+	@ManyToOne(fetch = FetchType.LAZY) //지연로딩 사용
+	@JoinColumn(name="TEAM_ID")
+	private Team team;
+	
+}
+```
+
+```
+Member m = em.find(Member.class, member1.getId()); //Member 객체 반환
+System.out.println("m = "+ m.getTeam().getClass()); //Team$HibernateProxy객체 반환
+m.getTeam().getName() // team을 실제로 사용하는 시점에서 db조회 엔티티 반환
+```
+- ***연관관계에 있는 다른 엔티티를 사용하는 빈도수가 낮을 경우 지연로딩을 사용해 불필요한 엔티티 조회를 막을 수 있다.***
+
+### 즉시로딩
+- ***Member와 Team을 같이 쓰는 빈도가 높을 경우에는 어떻게 해야 할까?***
+- 즉시로딩 fetch = FetchType.EAGER를 사용해서 함께 조회
+```
+/*Member*/
+@Entity
+public class Member{
+	
+	@ManyToOne(fetch = FetchType.EAGER) //즉시로딩 사용
+	@JoinColumn(name="TEAM_ID")
+	private Team team;
+	
+}
+```
+```
+Member m = em.find(Member.class, member1.getId()); //Member 객체 반환
+System.out.println("m = "+ m.getTeam().getClass()); //Team 객체 반환
+
+```
+- ***Member를 가져오는 시점에서 연관관계에 있는 Team까지 바로 가져오는 것을 즉시 로딩이라 한다.***
