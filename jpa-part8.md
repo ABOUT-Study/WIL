@@ -124,10 +124,6 @@ List<Member> members = em.createQuery("select m from Member m", Member.class)
 ```
 - 위 JPQL을 그대로 쿼리로 번역하게 되면 Member를 가져오기 위한 쿼리 수행 이후 바로 Member 내부의 Team을 가져오기 위한 쿼리를 다시 수행하게 된다 → N+1(1개의 쿼리를 날리면 +N개의 쿼리가 추가수행된다)
 
-### 설정
-- @ManyToOne, @OneToOne은 기본이 즉시 로딩으로 되어 있다.→ 직접 전부 LAZY로 설정
-- @OneToMany, @ManyToMany는 기본이 지연 로딩
-
 ### N+1의 해결책
 1. 전부 지연로딩으로 설정한다.
 2. 가져와야하는 엔티티에 한해서 fetch join을 사용해서 가져온다.
@@ -136,6 +132,10 @@ List<Member> members = em.createQuery("select m from Member m fetch join m.team"
 				.getResultList();
 ```
 이렇게 JPQL을 실행하면 fetch join을 통해 Team 도 가져왔기 때문에 문제가 없다.
+
+### 설정
+- @ManyToOne, @OneToOne은 기본이 즉시 로딩으로 되어 있다.→ 직접 전부 LAZY로 설정
+- @OneToMany, @ManyToMany는 기본이 지연 로딩
 
 # 영속성 전이(CASCAD)와 고아객체
 - 특정 엔티티를 영속 상태로 만들 때 연관된 엔티티도 함께 영속 상태로 만들고 싶을 때 사용.
