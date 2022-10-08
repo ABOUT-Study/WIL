@@ -130,3 +130,51 @@ List<Member> members = em.createQuery("select m from Member m fetch join m.team"
 				.getResultList();
 ```
 이렇게 JPQL을 실행하면 fetch join을 통해 Team 도 가져왔기 때문에 문제가 없다.
+
+# 영속성 전이(CASCAD)와 고아객체
+- 특정 엔티티를 영속 상태로 만들 때 연관된 엔티티도 함께 영속 상태로 만들고 싶을 때 사용.
+- ex: 부모 엔티티를 저장할 때 자식 엔티티도 함께 저장.
+
+```
+Child child1 = new Child();
+Child child2 = new Child();
+Parent parent = new Parent();
+parent.addChild(child1);
+parent.addChild(child2);
+
+em.persist(parent);
+em.persist(child1);
+em.persist(child2);// persist를 3번이나 해야한다.
+```
+
+- 영속성 전이(CASCADE)를 이용한 엔티티 저장 방법
+```
+@Entity
+public class Parent{
+	...
+	@OneToMany(mappedBy = "parent", cascade=CascadeType.ALL)//영속성 전이 속성(CASCADE)사용
+	private List<Child> childList = new ArrayList<>();
+
+	public void addChild(Child child){
+		childList.add(child);
+		child.setParent(this);
+	}
+	...
+}
+```
+
+```
+Child child1 = new Child();
+Child child2 = new Child();
+Parent parent = new Parent();
+parent.addChild(child1);
+parent.addChild(child2);
+
+em.persist(parent);// parent만 persist 해주니 child도 같이 persist된다.
+```
+- parent만 persist해주니 그에 관련된 childList들도 같이 persist가 된다.
+
+### cascade 주의사항 2가지
+- 만약 또다른 엔티티가 child를 소유하고 있다면 cascade 사용을 지양해야한다. 너무 복잡해질수 있다. ***즉, 어떤 엔티티(child)의 소유자(parent)가 1개 일때만 사용하는 것이 좋다.***
+- 라이프 싸이클이 똑같을때. ***parent와 child가 생성되고 삭제되는 싸이클이 비슷한경우에 사용하는 것이 좋다***
+
