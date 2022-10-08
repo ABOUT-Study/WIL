@@ -124,6 +124,7 @@ List<Member> members = em.createQuery("select m from Member m", Member.class)
 ```
 - 위 JPQL을 그대로 쿼리로 번역하게 되면 Member를 가져오기 위한 쿼리 수행 이후 바로 Member 내부의 Team을 가져오기 위한 쿼리를 다시 수행하게 된다 → N+1(1개의 쿼리를 날리면 +N개의 쿼리가 추가수행된다)
 
+### 설정
 - @ManyToOne, @OneToOne은 기본이 즉시 로딩으로 되어 있다.→ 직접 전부 LAZY로 설정
 - @OneToMany, @ManyToMany는 기본이 지연 로딩
 
