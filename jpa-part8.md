@@ -95,3 +95,38 @@ System.out.println("m = "+ m.getTeam().getClass()); //Team 객체 반환
 
 ```
 - ***Member를 가져오는 시점에서 연관관계에 있는 Team까지 바로 가져오는 것을 즉시 로딩이라 한다.***
+
+### 즉시로딩 주의사항
+- 즉시로딩을 적용하면 예상하지 못한 SQL이 발생한다.
+- ***ex. 하나의 엔티티에 연관된 엔티티가 다수라면 find() 한 번 수행시 수십 수백개의 테이블을 조인해서 한번에 가져온다.***
+- 즉시로딩은 JPQL에서 N+1 문제를 일으킨다.
+```
+/*Member*/
+@Entity
+public class Member{
+	...
+	@ManyToOne(fetch = FetchType.EAGER) //즉시로딩 사용
+	@JoinColumn(name="TEAM_ID")
+	private Team team;
+	...
+}
+...
+List<Member> members = em.createQuery("select m from Member m", Member.class)
+				.getResultList();
+//SQL: select * from Member
+//SQL: select * from Team where TEAM_ID = xxx
+...
+```
+- 위 JPQL을 그대로 쿼리로 번역하게 되면 Member를 가져오기 위한 쿼리 수행 이후 바로 Member 내부의 Team을 가져오기 위한 쿼리를 다시 수행하게 된다 → N+1(1개의 쿼리를 날리면 +N개의 쿼리가 추가수행된다)
+
+- @ManyToOne, @OneToOne은 기본이 즉시 로딩으로 되어 있다.→ 직접 전부 LAZY로 설정
+- @OneToMany, @ManyToMany는 기본이 지연 로딩
+
+### N+1의 해결책
+1. 전부 지연로딩으로 설정한다.
+2. 가져와야하는 엔티티에 한해서 fetch join을 사용해서 가져온다.
+```
+List<Member> members = em.createQuery("select m from Member m fetch join m.team", Member.class)
+				.getResultList();
+```
+이렇게 JPQL을 실행하면 fetch join을 통해 Team 도 가져왔기 때문에 문제가 없다.
