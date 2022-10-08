@@ -4,7 +4,8 @@
 만약 회원이 사물함을 등록하지 않았다면 다음처럼 외래키에 null이 입력 될 것이다.
 이처럼 외래키에 null을 허용하는 관계를 선택적 비식별 관계라 한다.
 
-(그림1,그림2)
+![1](https://user-images.githubusercontent.com/22884224/194715921-b234f671-7d8f-4e81-a03b-7e0f01437f5a.png)
+![2](https://user-images.githubusercontent.com/22884224/194715931-9ce94b44-71a9-4475-92be-68c4b16d070f.png)
 
 선택적 비식별 관계에서는 외래키에 null을 허용하므로 회원과 사물함을 조인할 때 외부 조인을 사용해야한다.
 만약 실수로 내부 조인을 사용하면 사물함과 관계가 없는 회원은 조회되지않기때문이다.
@@ -19,6 +20,7 @@
 
 다음 그림을 보면 MEMBER와 LOCKER의 연관관계를 맺으려면 MEMBER_LOCKER 테이블에 값만 추가하면 된다.
 
-(그림3,그림4)
+![3](https://user-images.githubusercontent.com/22884224/194715942-1b03bd3a-a874-46c3-bebb-06450013833e.png)
+![4](https://user-images.githubusercontent.com/22884224/194715947-430f7847-80ff-4448-a6ab-26d8015ef18a.png)
 
 하지만 테이블 자체를 하나 더 추가해야한다는 단점이 있다. 그러면 MEMBER와 LOCKER테이블을 조인할때 추가된 테이블도 조인해야한다.
