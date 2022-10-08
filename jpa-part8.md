@@ -15,6 +15,7 @@ em.getReference() : 데이터 베이스 조회를 미루는 프록시 엔티티 
 - getReference() 메서드를 사용하면 진짜 객체가 아닌 하이버 네이트 내부 로직으로 프록시 엔티티 객체를 반환한다. 
 - 프록시 객체는 간단히 설명하면 객체 틀은 같지만 내용이 비어있는 개체다.
 
+<img width="716" alt="1" src="https://user-images.githubusercontent.com/22884224/194730823-24ec320b-f7ec-4939-9ee8-b30c9fca29ef.png">
 
 ### 특징
 - 실제 클래스를 상속받아서 만들어짐. 그래서 타입체크시 주의해야함.
@@ -23,6 +24,9 @@ m1.getClass() == m2.getClass() //false
 m1 instanceof Member // true
 m2 instanceof Member // true
 ```
+
+<img width="767" alt="2" src="https://user-images.githubusercontent.com/22884224/194730828-89d54b63-38e9-4255-b7f6-10e860844d99.png">
+
 - 실제 클래스와 겉 모양이 같다.
 - 프록시 객체는 실제 객체의 참조를 보관한다.
 - 프록시 객체를 호출하면 프록시 객체는 실제 객체의 메소드 호출(프록시 객체가 실제 엔티티로 바뀌는것이 아니다)
@@ -49,6 +53,8 @@ member.getName();//(2)-
 - (2) getName()을 하면 JPA가 영속성 컨텐스트에 초기화 요청을 한다.
 - (3) 영속성 컨텍스트에서는 실제 db를 조회해서 가져온 다음 실제 Entity에 값을 넣어 생성한 다음, 프록시 객체와 실제 엔티티를 연결해서 실제 엔티티를 반환한다.
 - 그 이후에는 이미 초기화 되어있는 프록시 객체이기에 해당 엔티티를 반환한다.
+
+![3](https://user-images.githubusercontent.com/22884224/194730830-89b3294c-6db1-406a-bfea-a54224fc1d70.png)
 
 ---
 
