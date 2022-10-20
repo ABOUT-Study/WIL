@@ -14,7 +14,7 @@
 
 속성 optional, fetch(글로벌 페치전략), cascade(영속성 전이기능), targetEntity(연관엔티티 타입 정보설정 잘안씀)
 
-@JoinColumn 외래기 매핑시 사용 (생략가능)
+@JoinColumn 외래키 매핑시 사용 (생략가능)
 
 속성 name(외래키이름 필드명_키컬럼명) 등등 @Column 속성과 비슷
 
