@@ -72,8 +72,8 @@ List<Member> resultList = em.createNativeQuery(sql, Member.class)
 - 엔티티 이름 사용, 테이블 이름이 아님(Member)
 - 별칭은 필수(alias) (as는 생략 가능)
 
-## TypeQuery, Query
-- TypeQuery : 반환 타입이 명확할 때 사용
+## TypedQuery, Query
+- TypedQuery : 반환 타입이 명확할 때 사용
 ``` 
 TypedQuery<Member> query = em.createQuery("SELECT m FROM Meber m", Member.class);
 ```
