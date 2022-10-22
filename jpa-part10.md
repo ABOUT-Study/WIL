@@ -112,31 +112,32 @@ String query = "SELECT a FROM Address a";
 ```
 
 3. 여러 값 조회 프로젝션
-1) Query 타입으로 조회
+- Query 타입으로 조회
 ```
-	Query query = em.createQuery("SELECT m.username, m.age FROM Member m");
-	List result = query.getResultList();
-	
-	Iterator iterator = resultList.iterator();
-	while(iterator.hasNext()) {
-		Object[] row = (Object[]) iterator.next();
-		...
-	}
+Query query = em.createQuery("SELECT m.username, m.age FROM Member m");
+List result = query.getResultList();
+
+Iterator iterator = resultList.iterator();
+while(iterator.hasNext()) {
+	Object[] row = (Object[]) iterator.next();
+	...
+}
 ```
-2) Object[] 타입으로 조회
+
+- Object[] 타입으로 조회
 ```
-	List<Object[]> resultList = em.createQuery("SELECT m.username, m.age FROM Member m").getResultList();
-	
-	for (Object[] row : resultList) {
-		String userName = (String) row[0];
-		Integer age = (Integer) row[1];
-	}
+List<Object[]> resultList = em.createQuery("SELECT m.username, m.age FROM Member m").getResultList();
+
+for (Object[] row : resultList) {
+	String userName = (String) row[0];
+	Integer age = (Integer) row[1];
+}
 ```
-4) new 명령어로 조회
-	- 단순 값을 DTO로 바로 조회
-	SELECT new jpabook.jpql.UserDTO(m.username, m.age)from Memer m;
-	- 패키지 명을 포함한 전체 클래스 명을 적어줘야 한다.
-	- 순서와 타입이 일치하는 생성자 필요
+
+- new 명령어로 조회
+   - 단순 값을 DTO로 바로 조회 ( SELECT new jpabook.jpql.UserDTO(m.username, m.age)from Memer m; )
+   - 패키지 명을 포함한 전체 클래스 명을 적어줘야 한다.
+   - 순서와 타입이 일치하는 생성자 필요
 ```
 TypedQuery<UserDTO> query = em.createQUery("SELECT new jpabook.jpql.UserDTO(m.username, m.age) FROM Member m", UserDTO.class);
 
