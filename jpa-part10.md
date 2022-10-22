@@ -143,3 +143,9 @@ TypedQuery<UserDTO> query = em.createQUery("SELECT new jpabook.jpql.UserDTO(m.us
 
 List<UserDTO> resultList = query.getResultList();
 ```
+
+## 페이징 처리
+- 데이터베이스마다 페이징을 처리하는 SQL 문법이 다르다.
+- 그래서 JPA는 페이징을 다음 두 API로 추상화했다.
+	- setFirstResult(int startPosition): 조회 시작 위치(0부터 시작)
+	- setMaxResults(int maxResult): 조회할 데이터 수
