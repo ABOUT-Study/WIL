@@ -1,4 +1,4 @@
-package designPattern.factory.abstractFactory;
+package designPattern.factory.factorymethod;
 
 public class ChicagoStyleCheesePizza extends Pizza {
     public ChicagoStyleCheesePizza() {

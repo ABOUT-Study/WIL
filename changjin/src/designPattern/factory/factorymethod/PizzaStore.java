@@ -1,4 +1,4 @@
-package designPattern.factory.abstractFactory;
+package designPattern.factory.factorymethod;
 
 public abstract class PizzaStore {
 
@@ -7,7 +7,7 @@ public abstract class PizzaStore {
         수퍼클래스의 클라이언트 코드와 서브클래스의 객체 생성 코드를 분리시킬 수 있다.
      */
 
-    abstract Pizza createPizza(String type);
+    public abstract Pizza createPizza(String type);
 
     public Pizza orderPizza(String type) {
         Pizza pizza;

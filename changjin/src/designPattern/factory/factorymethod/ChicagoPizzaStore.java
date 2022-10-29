@@ -1,10 +1,10 @@
-package designPattern.factory.abstractFactory;
+package designPattern.factory.factorymethod;
 
-public class NYPizzaStore extends PizzaStore {
+public class ChicagoPizzaStore extends PizzaStore{
     @Override
-    Pizza createPizza(String item) {
+    public Pizza createPizza(String item) {
         if (item.equals("cheese")) {
-            return new NYStyleCheesePizza();
+            return new ChicagoStyleCheesePizza();
 //        } else if (item.equals("veggie")) {
 //            return new NYStyleVeggiePizza();
 //        } else if (item.equals("clam")) {
