@@ -138,6 +138,8 @@ List<Member> members = em.createQuery("select m from Member m fetch join m.team"
 - @OneToMany, @ManyToMany는 기본이 지연 로딩
 
 # 영속성 전이(CASCAD)와 고아객체
+
+### 영속성 전이
 - 특정 엔티티를 영속 상태로 만들 때 연관된 엔티티도 함께 영속 상태로 만들고 싶을 때 사용.
 - ex: 부모 엔티티를 저장할 때 자식 엔티티도 함께 저장.
 
@@ -184,3 +186,22 @@ em.persist(parent);// parent만 persist 해주니 child도 같이 persist된다.
 - 만약 또다른 엔티티가 child를 소유하고 있다면 cascade 사용을 지양해야한다. 너무 복잡해질수 있다. ***즉, 어떤 엔티티(child)의 소유자(parent)가 1개 일때만 사용하는 것이 좋다.***
 - 라이프 싸이클이 똑같을때. ***parent와 child가 생성되고 삭제되는 싸이클이 비슷한경우에 사용하는 것이 좋다***
 
+### 고아 객체
+- 부모 엔티티와 연결관계가 끊어진 자식 엔티티를 자동 삭제하는 기능을 제공
+- 삭제한 엔티티가 다른곳에서 참조하면 문제가 발생할 수 있어서 @OneToMany, @OneToOne 에서만 사용가능
+- orphanRemoval = true 옵션 사용
+
+```
+Parent parent = em.find(Parent.class, id);
+parent.getChildren().remove(0); // 자식 엔티티를 컬렉션에서 제거
+parent.getChildren().clear(); // 모든 자식 엔티티 제거
+```
+
+### 참고사항
+- CascadeType.REMOVE 설정과 같음
+
+## 영속성 전이 + 고아객체 (생명주기 관리)
+CascadeType.ALL + orphanRemoval = true
+두 옵션을 모두 활성화시 부모 엔티티를 통해서 자식의 생명주기를 관리할 수 있다
+- 자식을 저장하려면 부모에 등록만 하면 된다 (Cascade)
+- 자식을 삭제하려면 부모에서 제거하면 된다 (orphanRemoval)
