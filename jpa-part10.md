@@ -202,6 +202,9 @@ JPQL 은 JOIN 명령어 다음에 조인할 객체의 연관 필드를 사용한
 ```
 SELECT m
 from Member m [INNER] JOIN m.team t WHERE t.name = :teamName
+
+SELECT m
+from Member m [INNER] JOIN m.team on m.team_id = t.id t WHERE t.name = :teamName
 ```
 
 ### 외부조인
