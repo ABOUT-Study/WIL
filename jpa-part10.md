@@ -301,3 +301,64 @@ JPQL 은 결과를 반환할 때 연관관계를 고려하지 않는다. SELECT 
 3. JPA 표준에서는 페치 조인 대상에는 별칭을 줄 수 없다.(하이버네이트는 지원하지만 잘못사용시 데이터 무결성이 깨질 수 있음)
 4. 둘 이상의 컬렉션을 페치할 수 없다.(2개 이상의 일대다 관계 조인 불가능)
 5. 컬렉션(일대다)을 페치 조인하면 페이징 API 사용할 수 없다.
+
+### 경로 표현식
+jpql에서 .을 사용해서 객채의  값에 접근할 수 있다. 이를 경로 표현식이라 한다.
+
+- 상태 필드 : 단순히 값을 저장하기 위한 필드
+ex) "select m.username from Member m"
+- 연관 필드 : 연관관계를 위한 필드
+     - 단일 값 연관 필드 : @ManyToOne, @OneToOne, 대상이 엔티티   
+      ```"select m.team from Member m" ```
+     - 컬렉션 값 연관 필드 : @OneToMany, @ManyToMany, 대상이 컬렉션   
+      ```"select m.orders from Member m"```   
+      (컬렉션 값은 더 이상 탐색이 불가능하지만 명시적 조인을 통해 별칭을 얻어 탐색 할 수 있다)   
+      ```"select t.members,m.username from Team t join t.members m"```
+      
+- 주의사항
+***연관 필드에서 묵시적 내부 조인이 발생***한다. 즉, select m.team from Member m은 명시적으로 join을 쓰지 않았지만 
+```select from Member m inner join Team t on m.team_id = t.id```같이 내부적으로 inner join이 추가되어 db에서 조회된다.
+
+***묵시적 조인은 조인이 일어나는 상황을 개발자가 파악하기 어렵기 때문에 지양하고 명시적 조인을 사용하자!***
+
+### 서브 쿼리
+
+```
+나이가 평균보다 많은 회원
+
+select m from Member m
+where m.age > (select avg(m2.age) from Member m2)
+```
+
+일반 sql 문과 같다.
+기억해야할 것은 where, having 절에서는 서브쿼리가 사용가능하지만 ***from 절의 서브쿼리는 현재 jpql에서 사용 불가능***하다.
+이를 구현하려면 다른 방법으로 모색해야한다.
+
+### 조건식
+기본 CASE 식
+```
+select 
+	case when m.age <= 10 then '학생요금'
+	     when m.age >= 60 then '경로 요금'
+	     else '일반요금'
+	end
+from Member m
+```
+단순 CASE 식
+```
+select 
+	case t.name
+	     when '팀A' then '인센티브110%'
+	     when '팀B' then '인센티브120%'
+	     else '인센티브105%'
+	end
+from Team t
+```
+- COALESCE : 하나씩 조회해서 null 이 아니면 반환
+```
+select coalesce(m.username, '이름 없는 회원') from Member m
+```
+- NULLIF : 두 값이 같으면 null 반환, 다르면 첫번째 값 반환
+```
+select NULLIF(m.username, '관리자') from Member m
+```
