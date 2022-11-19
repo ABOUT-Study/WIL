@@ -362,3 +362,50 @@ select coalesce(m.username, '이름 없는 회원') from Member m
 ```
 select NULLIF(m.username, '관리자') from Member m
 ```
+
+### 엔티티 직접 사용
+
+- 기본키
+  - JPQL에서 엔티티를 직접 사용하면 SQL에서 해당 엔티티의 기본키 값을 사용한다.
+
+
+```
+select count(m.id) from Member m
+select count(m) from Member m
+
+- 위에 JPQL들은 아래와 같다.
+select count(m.id) as cnt from Member m
+```
+
+```
+String jpql = "select m from Member m where m = :member";
+List resultList = em.createQuery(jpql)
+		.setParameter("member", member)
+		.getResultList();
+
+
+String jpql = "select m from Member m where m.id = :memberId";
+List resultList = em.createQuery(jpql)
+		.setParameter("memberId", memberId)
+		.getResultList();
+		
+- 파라미터를 엔티티로 직접 전달해도 결과는 식별자 전달된다.
+select m.* from Member m where m.id = ?
+```
+
+- 외래키
+```
+Team team = em.find(Team.class, 1L);
+String qlString = "select m from Member m where m.team = :team";
+List resultList = em.createQuery(qlString)
+    .setParameter("team", team)
+    .getResultList();
+    
+String qlString = "select m from Member m where m.team.id = :teamId";
+List resultList = em.createQuery(qlString)
+    .setParameter("teamId", teamId)
+    .getResultList();
+    
+- 연관관계 객체에 엔티티를 넣어줘도 결과는 식별자(외래키)로 전달된다. 
+select m.* from Member m where m.team_id=?
+```
