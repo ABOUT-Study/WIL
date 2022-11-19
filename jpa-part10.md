@@ -409,3 +409,23 @@ List resultList = em.createQuery(qlString)
 - 연관관계 객체에 엔티티를 넣어줘도 결과는 식별자(외래키)로 전달된다. 
 select m.* from Member m where m.team_id=?
 ```
+
+### Named 쿼리
+- 미리 정의해서 이름을 부여해두고 사용하는 JPQL
+- 어노테이션이나 XML에 정의된다.
+- **장점1 : 애플리케이션 로딩 시점에 초기화 후 재사용(= 미리 sql로 초기화해준다)**
+- **장점2 : 애플리케이션 로딩 시점에 쿼리를 검증해준다(= 컴파일 시점에 오류를 확인할 수 있음)**
+
+```
+@NamedQuery(
+name = "Member.findByUsername",
+query="select m from Member m where m.username = :username")
+```
+
+```
+List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+                .setParameter("username", "회원1")
+                .getResultList();
+```
+
+- **NamedQuery는 Spring Data JPA의 @Query와 비슷하게 동작한다. 실무에서는 Spring Data JPA를 쓸테니 @Query를 훨씬더 많이 사용한다.  **
