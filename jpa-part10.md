@@ -428,4 +428,4 @@ List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.cl
                 .getResultList();
 ```
 
-- **NamedQuery는 Spring Data JPA의 @Query와 비슷하게 동작한다. 실무에서는 Spring Data JPA를 쓸테니 @Query를 훨씬더 많이 사용한다.  **
+- **NamedQuery는 Spring Data JPA의 @Query와 비슷하게 동작한다. 실무에서는 Spring Data JPA를 쓸테니 @Query를 훨씬더 많이 사용한다.**
