@@ -92,3 +92,25 @@ public interface MemberRepository extedns JpaRepository<Member, Long> { // 여�
     List<Member> findByUsername(@Parma("username") String username); // 이름 기반 파라미터를 바인딩
 }
 ```
+
+3. @Query, 레포지토리 메소드에 쿼리 정의
+- @Query 어노테이션을 사용해 실행할 메소드에 정적 쿼리를 직접 작성하므로 이름없는 Named 쿼리라고 할 수 있으며, JPA Named 쿼리처럼 실행 시점에 문법 오류를 발견할 수 있음
+- 만약 네이티브 SQL을 사용하려면 @Query 어노테이션에 nativeQuery = true를 설정
+```
+// 메소드에 JPQL 쿼리 작성
+public interface MemberRepository extends JpaRepository<Member, Long> {
+
+    @Query("select m from Member m where m.username = ?1")
+    Member findByUsername(String username);
+{
+```
+
+```
+// JPA 네이티브 SQL 지원
+public interface MemberRepository extends JpaRepository<Member, Long> {
+
+    @Query(value = "SELECT * FROM MEMBER WHERE USERNAME = ?0", nativeQuery = true)
+    Member findByUsername(String username);
+}
+```
+
