@@ -38,7 +38,7 @@ public class Singleton {
     
     private Singleton() {}
 
-    public static synchronized Singleton getInstance() { // threadsafe
+    public static Singleton getInstance() { // threadsafe
         return uniqueInstance;
     }
 }
