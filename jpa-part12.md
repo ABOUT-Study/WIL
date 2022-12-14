@@ -57,7 +57,7 @@ public interface MemberRepository extends Repository<Member, Long> {
 ```
 
 2. JPA NamedQuery
-- 쿼리에 이름을 부여해서 사용하는 방법으로 어노테이션이나 XML에 쿼리를 정의할 수 있음
+- 정의 : 쿼리에 이름을 부여해서 사용하는 방법으로 어노테이션이나 XML에 쿼리를 정의할 수 있음
 ```
 // @NamedQuery 어노테이션으로 Named 쿼리 정의
 @Entity
