@@ -1,6 +1,7 @@
-package designPattern.command;
+package designPattern.command.simpleCommand;
 
-public class SimpleRemoteControl { // 인보커
+// 인보커
+public class SimpleRemoteControl {
 
     Command slot;
 
