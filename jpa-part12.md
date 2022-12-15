@@ -22,7 +22,7 @@ public class TeamRepository {
 
 # 스프링 데이터 JPA
 - 스프링 프레임워크에서 JPA를 편리하게 사용할 수 있도록 ***스프링 데이터 JPA***를 지원한다.
-- 스프링 데이터 JPA는 CRUD를 처리하기 위한 공통 인터페이스를 제공하고, 사용자는 구현 클래스 없이 인터페이스만 작성해도 개발이 가능하다.
+- 스프링 데이터 JPA는 CRUD를 처리하기 위한 ***공통 인터페이스를 제공***하고, 사용자는 ***구현 클래스 없이 인터페이스만 작성해도 개발이 가능***하다.
 (인터페이스를 작성하면 실행시점에 스프링 데이터 JPA가 구현객체를 동적으로 생성 및 주입해주기 떄문이다)
 
 ### JpaRepository
@@ -120,8 +120,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 @Query("update Product p set p.price = p.price * 1.1 where p.stockAmount < :stockAmount")
 int bulkPriceUp(@Param("stockAmount") String stockAmount);
 ```
-- 벌크성 수정, 삭제 쿼리는 @Modifying 어노테이션을 사용하면 된다.
-    - 사용하지 않으면 ueryExecutionRequestException 예외 발생
+- 벌크성 수정, 삭제 쿼리는 ***@Modifying 어노테이션***을 사용하면 된다.
+    - 사용하지 않으면 queryExecutionRequestException 예외 발생
 - 벌크성 쿼리를 실행하고 나서 영속성 컨텍스트를 초기화하고 싶으면 clearAutomatically 옵션을 true로 설정하면 된다.
     - 이 옵션 없이 findById 로 다시 조회하면 영속성 컨텍스트에 과거 값이 남아서 문제가 될 수 있다. 만약 다시 조회해야 하면 꼭 영속성 컨텍스트를 초기화 하자.
 
@@ -135,7 +135,7 @@ int bulkPriceUp(@Param("stockAmount") String stockAmount);
 - 단건을 기대하고 반환 타입을 지정했는데 결과가 2건 이상이면 NonUniqueResultException 예외가 발생한다.
 
 ### 페이징과 정렬
-- 파라미터에 Pageagble를 사용하면 반환 타입으로 List나 Page를 사용할 수 있다.
+- 파라미터에 Pageable를 사용하면 반환 타입으로 List나 Page를 사용할 수 있다.
 - 반환타입으로 Page를 사용하면 전체 데이터 건수를 조회하는 count 쿼리를 추가로 호출한다.
 ```
 // count 쿼리 사용
@@ -160,7 +160,7 @@ boolean hasNextPage = result.hasNextPage();	// 다음 페이지 존재 여부
 - 페이지는 0부터 시작한다.
 
 ### 힌트
-- JPA 쿼리 힌트는 SQL 힌트가 아니라 JPA 구현체에게 제공하는 힌트다. 기본적으로 JPA가 변경감지에 의해 update 쿼리를 날리려면 원본을 캐시에 저장하고 관리하는 entity 객체 또한 따로 갖고 있는다. 이를 위해 영속성 컨텍스트는 항상 원본과 관리하는 사본 객체 두 객체를 메모리에 저장하게 된다. 하지만 이게 성능 이슈가 될 수도 있다. 읽기만 할때는 엔티티 객체 두개를 갖는것은 메모리 비용의 낭비가 될 수 있기 때문이다. 그래서 JPA Hint를 통해 읽기 전용이라고 알려주고 캐시에 원본(스냅샷)을 저장하지 않도록 공간 비용을 최적화 할 수 있다.
+- JPA 쿼리 힌트는 SQL 힌트가 아니라 JPA 구현체에게 제공하는 힌트다. 기본적으로 JPA가 변경감지에 의해 update 쿼리를 날리려면 원본을 캐시에 저장하고 관리하는 entity 객체 또한 따로 갖고 있는다. 이를 위해 영속성 컨텍스트는 항상 원본과 관리하는 사본 객체 두 객체를 메모리에 저장하게 된다. 하지만 이게 성능 이슈가 될 수도 있다. 읽기만 할때는 엔티티 객체 두개를 갖는것은 메모리 비용의 낭비가 될 수 있기 때문이다. 그래서 JPA Hint를 통해 읽기 전용이라고 알려주고 캐시에 사본 객체(스냅샷)를 저장하지 않도록 공간 비용을 최적화 할 수 있다.
 ```
 @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
 Member findReadOnlyByUsername(String username);
