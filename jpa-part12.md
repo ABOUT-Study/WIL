@@ -173,3 +173,77 @@ Page<Member> findByUsername(String name, Pagable pageable);
 - forCounting 속성은 반환타입으로 Page 인터페이스를 적용하면 추가로 호출하는 페이징을 위한 count 쿼리도 쿼리 힌트 적용(기본값 true)
 - 하지만 실제로 readOnly로 설정하고 성능 최적화를 해도 개선치는 미비하다. 성능 테스트를 해보고 확실하게 성능 개선이 된다면 사용하자!
 - 대부분은 Redis를 이용한 캐싱을 이용해서 성능 최적화를 함. Redis를 쓰지 않는 선에서 성능 최적화를 위해선 쓸 수 있지만, 필수라고 보기엔 적절하지 않다.
+
+## 명세
+- 도메인 주도 설계라는 책에서 명세라는 개념을 소개하는데, 스프링 데이터 JPA 는 JPA Criteria 로 이 개념을 사용할 수 있도록 지원한다.
+- [DDD] Specification 객체가 특정 조건을 만족하는지 확인하는 역할을 한다.
+- 명세(Specification)를 이해하기 위한 핵심 단어는 술어(predicate) 인데 이것은 단순히 참or거짓으로 평가된다.
+- 그리고 이것은 AND,OR 같은 연산자로 조합할 수 있다. 예를 들어 데이터를 검색하기 위한 제약 조건 하나하나를 술어라 할 수있다.
+- 이 술어를 스프링 데이터 JPA 는 Specification 클래스로 정의했다.
+
+사용하려면 JpaSpecificationExecutor 인터페이스를 상속받으면 된다.
+
+## 사용자 정의 리포지토리 구현
+- 여러가지 이유로 메소드를 직접 구현해야 할 때가 있는데 레포지토리를 직접 구현하면 공통 인터페이스까지 모두 구현해야 하기 때문에 필요한 메서드만 구현할 수 있도록 하는 방법을 제공한다.
+```Java
+// 인터페이스 이름은 자유
+public interface MemberRepositoryCustom {
+    public List<Member> findMemberCustom();
+}
+// 클래스명은 리포지토리 인터페이스 이름 + Impl 로 지어야함 (다르게 하고 싶을 경우 repositoryImplementationPostfix 설정을 변경해줘야함)
+public class MemberRepositoryImpl implements MemberRepositoryCustom {
+    @Override
+    public List<Member> findMemberCustom() {
+        ...//구현
+    }
+}
+// 마지막으로 리포지토리 인터페이스에서 커스텀 인터페이스 상속
+public interface MemberRepository entends JpaRepository<Member, Long>, MemberRepositoryCustom {
+    ...
+}
+```
+
+## Web 확장
+- 식별자로 도메인클래스를 바로 바인딩해주는 컨버터 기능, 페이징과 정렬 기능
+설정 JavaConfig 에 @EnableSpringDataWebSupport 추가시 HandlerMethodArgumentResolver 가 스프링 빈으로 등록된다.
+
+### 도메인 클래스 컨버터 기능
+```Java
+@GetMapping()
+public String memberUpdateForm(@RequestParam("id") Member member) {
+    return member.getName();
+}
+```
+
+### 페이징과 정렬 기능
+- 기본값은 page = 0, size = 20 변경시 @PageableDefault 사용
+- 페이징 정보가 둘 이상일 경우 @Qualifier("member"), @Qualifier("order") 어노테이션 사용
+```Java
+@GetMapping()
+public Page<Member> getMembers(@PageableDefault(size = 10, sort = "name", direction = Sort.Direction.DESC) Pageable pageable) {
+    Page<Member> members = memberRepo.findAll(pageable);
+    return members;
+}
+```
+
+## 스프링 데이터 JPA 가 사용하는 구현체
+- 스프링 데이터 JPA 가 제공하는 공통인터페이스는 SimpleJpaRepository 클래스가 구현한다.
+
+```Java
+@Repository
+@Transactional(readOnly = true)
+public class SimpleJpaRepository<T, ID extends Serializable> implements JpaRepository<T, ID>, JpaSpecificationExecutor<T> {
+    @Transactional
+    public <S extends T> S save(S entity) {
+        if (entityInfomation.isNew(entity)) {
+            em.persist(entity);
+            return entity;
+        } else {
+            return em.merge(entity);
+        }
+    }
+}
+```
+- @Transactional JPA의 모든 변경은 트랜잭션 안에서 이루어져야 하기때문에 (등록,수정,삭제)하는 메소드에는 트랜잭션이 적용되어 있고 서비스 계층에서 적용시 해당트랜잭션 전파
+- @Transactional(readOnly = true) 조회하는 메소드에는 readOnly 옵션이 적용되 플러시를 생략해 약간의 성능향상을 얻을 수 있다.
+- save() 새로운 엔티티면 저장하고 이미 있는 엔티티면 병합한다.
