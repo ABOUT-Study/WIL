@@ -183,6 +183,57 @@ Page<Member> findByUsername(String name, Pagable pageable);
 
 사용하려면 JpaSpecificationExecutor 인터페이스를 상속받으면 된다.
 
+```Java
+public interface OrderRepository extends JpaRepository<Order, Long>, 
+JpaSpecificationExecutor<Order> {
+
+}
+```
+```Java
+public interface JpaSpecificationExecutor<T> {
+    T findOne (Specification<T> spec);
+    List<T> findAll(Specification<T> spec);
+    Page<T> findAll(Specification<T> spec, Pageable pageable);
+    List<T> findAll(Specification<T> spec, Sort sort);
+    long count(Specification<T> spec);
+}
+```
+```Java
+public List<Order> findOrders(String name) {
+    List<Order> result = orderRepository.findAll(
+        where(memberName(name)).and(isOrderStatus())
+    );
+
+    return result;
+}
+```
+```Java
+public class OrderSpec {
+    public static Specification<Order> memberName(final String memberName) {
+        return new Specification<Order>() {
+            public Predicate toPredicate(Root<Order> root,
+                CriteriaQuery<?> query, CriteriaBuilder builder) {
+
+                if(StringUtils.isEmpty(memberName)) return null;
+
+                Join<Order, Member> m = root.join("member",
+                     JoinType.INNER); //회원과 조인
+                return builder.equal(m.get("name"), memberName)
+            }
+        }
+    }
+
+    public static Specification<Order> isOrderStatus() {
+        return new Specification<Order>() {
+            public Predicate toPredicate(Root<Order> root,
+                CriteriaQuery<?> query, CriteriaBuilder builder) {
+
+                return builder.equal(root.get("status"), OrderStatus.ORDER);
+            }
+        }
+    }
+}
+```
 ## 사용자 정의 리포지토리 구현
 - 여러가지 이유로 메소드를 직접 구현해야 할 때가 있는데 레포지토리를 직접 구현하면 공통 인터페이스까지 모두 구현해야 하기 때문에 필요한 메서드만 구현할 수 있도록 하는 방법을 제공한다.
 ```Java
