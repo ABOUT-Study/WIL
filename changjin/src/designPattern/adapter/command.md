@@ -82,3 +82,15 @@ public class TurkeyAdapter implements Duck {
 }
 ```
 
+### Enumeration을 Iterator에 적응시키기
+
+![img_6.png](img_6.png)
+
+![img_7.png](img_7.png)
+
+### 어댑터 사용 예
+
+- Arrays.asList() 함수 사용
+- 반환된 리스트는 ArraysAdapter 로서 Array의 특징을 가지게 됨
+- 리스트로 변환하더라도 고정 크기이므로 add(), remove() 사용 불가
+- 리스트의 set() 함수를 이용해서 요소 내용 변경 가능(단, 원래 배열의 내용도 변경됨)
