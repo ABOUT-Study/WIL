@@ -49,8 +49,8 @@ private Set<Member> members = new HashSet<Member>();
 - @OrderBy 는 JPQL의 order by 절 처럼 엔티티의 필드를 대상으로 한다.
 *하이버네이트는 Set 에 @OrderBy 를 적용해서 결과를 조회하면 순서를 유지하기 위해 HashSet 대신 LinkedHashSet을 내부에서 사용한다.
 
-## @Converter
-컨버터를 사용하면 엔티티의 데이터를 변환해서 데이터베이스에 저장할 수 있다.
+## 컨버터
+@Converter 를 사용하면 엔티티의 데이터를 변환해서 데이터베이스에 저장할 수 있다.
 
 ```Java
 // Entity Class
