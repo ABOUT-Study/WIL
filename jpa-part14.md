@@ -31,7 +31,7 @@ List<Member> collection = new ArrayList<Member>();
 
 ### List + @OrderColumn (실무에서 잘 사용하지 않는다)
 순서가 있는 특수한 컬렉션으로 인식 (데이터베이스에 순서값을 저장해서 조회할 때 사용한다는 의미)
-[테이블 이미지]
+![jpa14-1](https://user-images.githubusercontent.com/68458092/210575594-c67c3455-3da4-47be-b44c-abc7871f9eda.png)
 
 #### @OrderColumn 의 단점
 - Board 엔티티에서 매핑하므로 Comment 에서는 POSITION 값을 알 수가 없어서 Comment insert 시 값이 저장되지 않고 Board.comments 의 값을 사용해 UPDATE 가 추가된다.
@@ -87,7 +87,7 @@ public interface AttributeConverterK<X, Y> {
 ## 리스너
 모든 엔티티를 대상으로 생명주기에 따른 이벤트를 처리할 수 있다.
 
-[이벤트 종류 이미지 삽입]
+![jpa14-2](https://user-images.githubusercontent.com/68458092/210575908-6fc49591-718f-44e3-a78e-7321e6e1a7da.png)
 - PostLoad : 엔티티가 영속성 컨텍스트에 조회된 직후, 또는 refresh를 호출한 후(2차 캐시에 저장되어 있어도 호출된다.)
 - PrePersist : persist() 메소드를 호출해서 엔티티를 영속성 컨텍스트에 관리하기 직전에 호출된다. 식별자 생성 전략을 사용한 경우에는 엔티티의 식별자는 존재하지 않는 상태이다. 새로운 인스턴스를 merge 할 때도 수행된다.
 - PreUpdate : flush나 commit을 호출해서 엔티티를 데이터베이스에 수정하기 직전에 호출된다.
