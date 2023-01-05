@@ -152,3 +152,98 @@ public class Duck extends BaseEntity {
 - @ExcludeDefaultListeners : 기본 리스너 무시
 - @ExcludeSuperclassListeners : 상위 클래스 이벤트 리스너 무시
 
+## 엔티티 그래프
+#### 엔티티를 조회할 때 연관된 엔티티를 함께 조회하려면 FetchType.EAGER 로 설정하거나 페치 조인을 사용하면 되지만  
+항상 함께 조회하기 때문에 필요없을 때에도 조회하는 단점이 있다. 그래서 FetchType.LAZY 로 사용하고 연관된 엔티티를 함께  
+조회할 필요가 있으면 JPQL 페치 조인을 사용한다. 하지만 이럴 경우 중복되는 JPQL 작성이 많아진다.
+- 주문 조회
+- 주문과 주문한 유저 조회
+- 주문과 주문 아이템 조회
+모두 주문을 조회하지만 함께조회할 엔티티가 바뀌면서 주문조회 JPQL 이 반복된다.
+이럴때 JPA2.1 에 추가된 엔티티 그래프 기능을 사용하면 엔티티를 조회하는 시점에 함께 조회할 연관된 엔티티를 선택할 수 있다.
+
+### Named 엔티티 그래프
+```Java
+@NamedEntityGraph(name = "Order.withMember", attributeNodes = {
+    @NamedAttributeNode("member")
+})
+@Entity
+public class Order {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "MEMBER_ID")
+    private Member member;
+}
+```
+- name : 엔티티 그래프의 이름을 정의한다.
+- attributeNodes : 함께 조회할 속성을 선택한다. 이때 @NamedAttributeNode 를 사용하고 함께 조회할 속성을 선택한다.
+*둘 이상 정의시 @NamedEntityGraphs 사용
+
+### em.find()에서 엔티티 그래프 사용
+```Java
+EntityGraph graph = em.getEntityGraph("Order.withMember");
+
+Map hints = new HashMap();
+hints.put("javax.persistence.fetchgraph", graph);
+
+Order order = em.find(Order.class, orderId, hints);
+```
+- 엔티티 그래프는 JPA의 힌트 기능을 사용하므로 힌트의 키와 값을 위와 같이 넣어 주어야 한다.
+
+### subgraph
+```Java
+@NamedEntityGraph(name = "Order.withAll", attributeNodes = {
+    @NamedAttributeNode("member"),
+    @NamedAttributeNode(value = "orderItems", subgraph = "orderItems")
+    },
+    subgraphs = @NamedSubgraph(name = "orderItems", attributeNodes = {
+        @NamedAttributeNode("item")
+    })
+)
+@Entity
+public class Order {
+    ...
+}
+```
+- Order → OrderItem → Item과 같이 연달아서 엔티티 그래프를 조회할 경우 사용한다.
+### JPQL 에서 엔티티 그래프 사용
+```Java
+List<Order> resultList =
+    em.createQuery("select o from Order o where o.id = :orderId",
+        Order.class)
+        .setParameter("orderId", orderId)
+        .setHint("javax.persistence.fetchgraph", em.getEntityGraph("Order.withAll"))
+        .getResultList();
+```
+- em.find() 와 동일하게 힌트만 추가하면 된다.
+
+### 동적 엔티티 그래프
+```Java
+EntityGraph<Order> graph = em.createEntityGraph(Order.class);
+graph.addAttributeNodes("member");
+Subgraph<OrderItem> orderItems = graph.addSubgraph("orderItems");
+orderItems.addAttributeNodes("item");
+
+Map hints = new HashMap();
+hints.put("javax.persistence.fetchgraph", graph);
+
+Order order = em.find(Order.class, orderId, hints);
+```
+- 엔티티 그래프를 동적으로 구성하려면 createEntityGraph() 메소드를 사용하면 된다.
+
+### 엔티티 그래프 정리
+#### 이미 로딩된 엔티티
+- 영속성 컨텍스트에 해당 엔티티가 이미 로딩되어 있으면 엔티티 그래프가 적용되지 않는다.(아직 초기화되지 않은 프록시에는 엔티티 그래프가 적용된다.)
+```Java
+Order order = em.find(Order.class, orderId); // 이미 조회
+hints.put("javax.persistence.fetchgraph", em.getEntityGraph("Order.withMember"));
+
+Order order2 = em.find(Order.class, orderId, hints);
+```
+#### fetchgraph, loadgraph의 차이
+- fetchgraph는 엔티티 그래프에 선택한 속성만 함께 조회한다. 반면에 loadgraph 속성은 엔티티 그래프에  
+선택한 속성뿐만 아니라 글로벌 fetch 모드가 FetchType.EAGER로 설정된 연관관계도 포함해서 함께 조회한다.
