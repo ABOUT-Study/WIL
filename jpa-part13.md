@@ -70,3 +70,158 @@ class OrderService {
 - 모든 문제는 엔티티가 프리젠테이션 계층에서 준영속 상태이기 때문에 발생한다. ***이를 해결하는 방법은 OSIV 이다.***
 - OSIV는 영속성 컨텍스트를 뷰까지 열어든다는 뜻이다.
 
+# OSIV
+### 과거 OSIV: 요청당 트랜잭션
+- osiv의 핵심은 뷰에서도 지연로딩이 가능하다.
+- 가장 단순한 구현 방법은 클라이언트의 요청이 들어오자마자 서블릿 필터나 스프링 인터셉터에서 트랜잭션을 시작하고 요청이 끝날떄 트랜잭션도 종료하는 방법
+  - ***요청 당 트랜잭션(Transaction per Request) 방식의 OSIV***
+![jpa13-6](https://user-images.githubusercontent.com/22884224/211160005-708fcefb-e585-4b31-8dca-4a2b7b93c7db.png)
+- 트랜잭션을 요청에 시작과 종료에 동작하므로 영속성 컨텍스트도 동일한 범위에서 유지
+- 뷰에서도 지연 로딩을 할 수 있으므로 미리 초기화할 필요가 없어짐
+
+### 요청 당 트랜잭션 방식의 OSIV 문제점
+- 컨트롤러나 뷰 같은 프리젠테이션 계층이 엔티티를 변경할 수 있다는 점
+- 예를 들어 뷰에 노출할 떄만 이름을 변경하고, 실제 DB에는 반영하고 싶지 않은 경우 문제 발생
+```
+class MemberController {
+		
+		public String viewmember(Long id) {
+				Member member = memberService.getMember(id);
+				member.setName("XXX"); //보안상 XXX로 변경
+				model.addAttribute("member", member);
+				...				
+		}
+}
+```
+
+### 요청 당 트랜잭션 방식의 문제점 해결 3가지
+1. 읽기 전용 메소드만 제공하는 인터페이스를 프리젠테이션 계층에 제공
+```
+interface MemberView {
+		public String getName();
+}
+
+
+@Entity
+class Member implements MemberView {
+		...
+}
+
+
+class MemberService {
+
+		public MemberView getMember(id) {
+				return memberRepository.findById(id);
+		}
+}
+```
+
+2. 엔티티래핑
+- 엔티티의 읽기 전용 메소드만 가지고 있는 엔티티를 감싼 객체를 만들고 반환하는 방법
+```
+class MemberWrapper {
+		private Member member;
+
+		public MemberWrapper(Member member) {
+				this.member = member;
+		}
+
+		//읽기 전용 메소드만 제공
+		public String getName() {
+				member.getName();
+		}
+}
+```
+
+3. DTO만 반환
+- 가장 전통적인 방법이며 엔티티 대신에 단순히 데이터만 전달하는 객체인 DTO를 반환
+```
+class MemberDTO {
+		private String name;
+
+		//Getter, Setter
+}
+
+...
+MemberDTO memberDTO = new MemberDTO();
+memberDTO.setName(member.getName());
+return memberDTO;
+```
+
+- 하지만 위 방법모두 코드량이 증가하는 단점이 있다. 이런 문제들 때문에 ***요청당 트랜잭션 방식의 OSIV는 최근에 거의 사용하지 않음.***
+- 문제점을 보완해서 비즈니스계층에서만 트랜잭션을 유지하는 방식의 OSIV를 사용
+
+# 스프링 OSIV
+- 서블릿 필터에서 적용할지 스프링 인터셉터에서 적용할지에 따라 원하는 클래스를 선택 사용
+  - 하이버네이트 OSIV 서블릿 필터:
+    - org.springframework.orm.hibernate4.support.OpenSessionInViewFilter
+  - 하이버네이트 OSIV 스프링 인터셉터:
+    - org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor
+  - JPA OEIV 서블릿 필터:
+    - org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter
+  - JPA OEIV 스프링 인터셉터
+    - org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor
+
+### 스프링 OSIV 분석
+- 요청 당 트랜잭션 방식의 OSIV의 문제를 어느 정도 해결
+- 스프링 프레임워크가 제공하는 OSIV는 ***"비즈니스 계층에서 트랜잭션을 사용하는 OSIV"***
+![jpa13-7](https://user-images.githubusercontent.com/22884224/211160019-0b787aff-0582-4dbb-b307-3f82ba10bc08.png)
+- 스프링 프레임워크가 제공하는 OSIV의 동작 원리
+  - 클라이언트의 요청이 들어오면 서블릿 필터나 스프링 인터셉터에 영속성 컨텍스트를 생성 이때 트랜잭션은 시작하지 않음
+  - 서비스 계층에서 @Transactional로 트랜잭션을 시작할 때 1번에 미리 생성해둔 영속성 컨텍스트를 찾아와 트랜잭션을 시작
+  - 서비스 계층이 끝나면 트랜잭션을 커밋하고 영속성 컨텍스트를 플러시 이때 트랜잭션은 끝내지만 영속성 컨텍스트는 종료하지 않음
+  - 컨트롤러와 뷰까지 영속성 컨텍스트가 유지되므로 조회한 엔티티 영속상태를 유지
+  - 서블릿 필터나, 스프링 인터셉터로 요청이 돌아오면 영속성 컨텍스트를 종료 이때 ***플러시를 호출***하지 않고 바로 종료
+
+### 트랜잭션 없이 읽기
+- 영속성 컨텍스트를 통한 모든 변경은 트랜잭션 안에서 처리
+  - ***트랜잭션 없이 엔티티변경 후 플러시하면 TransactionRequiredException 예외 발생***
+- 엔티티를 변경하지 않고 단순 조회만 하는 경우 트랜잭션 없이 읽기가 가능 (지연 로딩도 조회)
+
+### 스프링이 제공하는 OSIV 적용 예제
+```
+class MemberController {
+		
+		public String viewMember(Long id) {
+				Member member = memberService.getMember(id);
+				member.setName("XXX"); //보안상 XXX로 변경
+				model.addAtrribute("member", member);
+		}
+}
+```
+- 스프링의 OSIV의 경우 2가지 이유로 영속성 컨텍스트를 플러시 처리 안함
+  - 트랜잭션을 사용하는 서비스 계층이 끝날 떄 ***트랜잭션이 커밋되면서 이미 플러시 처리***, 스프링이 제공하는 ***OSIV 서블릿 필터나 인터셉터는 요청이 끝나면 플러시 호출하지 않고 em.close()로 영속성 컨텍스트를 종료***
+  - 프리젠테이션 계층에서 em.flush()를 호출해서 강제 플러시해도 트랜잭션 범위 밖이므로 예외(TransactionRequiredException)가 발생
+
+### 스프링 OSIV 주의사항
+- 프리젠테이션 계층에서 엔티티를 수정한 직후 트랜잭션을 시작하는 서비스 호출시 문제 발생
+```
+class MemberController {
+		public String viewMember(Long id) {
+				Member member = memberService.getMember(id);
+				member.setName("XXX");
+				
+				memberService.biz();
+				return "view"
+		}
+}
+
+
+class MemberService {
+		@Transactional
+		public void biz() {
+				//... 비즈니스 로직 실행
+		}
+}
+```
+- 문제를 해결하기 위한 단순한 방법은 트랜잭션이 있는 비즈니스 로직 호출 후 엔티티 변경
+```
+memberService.biz(); //비즈니스 로직 먼저 실행
+
+Member member = memberService.getMember(id);
+member.setName("XXX"); //마지막에 엔티티를 수정
+
+```
+  - 스프링 OSIV는 같은 영속성 컨텍스트를 여러 트랜잭션이 공유할 수 있으므로 이런 문제 발생
+  - OSIV를 사용하지 않는 영속성 컨텍스트 전략은 트랜잭션 생명주기와 같으므로 문제 발생 X
+    
