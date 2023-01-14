@@ -3,6 +3,7 @@ package designPattern.adapter.duck;
 // adapter
 public class TurkeyAdapter implements Duck {
 
+    // 어댑티
     Turkey turkey;
 
     public TurkeyAdapter(Turkey turkey) {

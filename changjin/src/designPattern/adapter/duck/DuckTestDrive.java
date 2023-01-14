@@ -1,5 +1,7 @@
 package designPattern.adapter.duck;
 
+import java.util.List;
+
 public class DuckTestDrive {
     public static void main(String[] args) {
         MallardDuck duck = new MallardDuck();
@@ -15,6 +17,9 @@ public class DuckTestDrive {
         testDuck(duck);
         System.out.println("\nThe TurkeyAdapter says…");
         testDuck(turkeyAdapter);
+        List list = List.of(1, 2);
+        list.add(1);
+
 
 //        DuckQuack duckQuack = new DuckQuack(turkeyAdapter);
 //        DuckQuack duckQuack2 = new DuckQuack(duck);
