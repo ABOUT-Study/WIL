@@ -127,7 +127,7 @@ public void 프록시와_동등성비교() {
 		em.clear();
 
 		Member refMember = em.getReference(Member.class, "member1");
-		Member findMember = new Member(Member.class, "member1");
+		Member findMember = em.find(Member.class, "member1");
 		
  		System.out.println("refMember = " + refMember.getClass());
     		System.out.println("findMember = " + findMember.getClass());
@@ -149,7 +149,7 @@ public void 프록시와_동등성비교() {
 		em.flush();
 		em.clear();
 
-		Member findMember = new Member(Member.class, "member1");
+		Member findMember = em.find(Member.class, "member1");
 		Member refMember = em.getReference(Member.class, "member1");
 		
  		System.out.println("refMember = " + refMember.getClass());
