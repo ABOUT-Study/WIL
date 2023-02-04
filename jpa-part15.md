@@ -162,3 +162,136 @@ public void 프록시와_동등성비교() {
 
 ### 프록시 타입 비교
 - 프록시는 원본 엔티티를 상속 받아서 생성된다. 그러므로 프록시로 조회된 엔티티의 타입을 비교할 때는 ==가 아니라 instanceof를 사용해야한다.
+
+### 상속관계와 프록시
+
+- 상속 관계를 프록시로 조회할 때 발생할 수 있는 문제점과 해결방안을 알아보자
+![jpa 15-4](https://user-images.githubusercontent.com/22884224/216765251-8df43a3b-916b-467b-ac62-004b9ef130a9.png)
+
+- 위와 같은 구조의 클래스 모델을 생성할 경우 프록시를 부모 타입으로 조회하면 문제가 발생한다.
+```
+@Test
+public void 부모타입으로_프록시조회() {
+	//테스트 데이터 준비
+	Book saveBook = new Book();
+	saveBook.setName("jpaBook");
+	saveBook.setAuthor("kim");
+	em.persist(saveBook);
+
+	em.flush();
+	em.clear();
+
+	//테스트 시작
+	Item proxyItem = em.getReference(Item.class, saveBook.getId());
+	System.out.println("proxyItem = " + proxyItem.getClass());
+
+	if (proxyItem instanceof Book) {			// false
+		System.out.println("proxyItem instanceof Book");
+		Book book = (Book) proxyItem;			// false
+		System.out.println("책 저자 = " + book.getAuthor());
+	}
+
+	//결과 검증
+	Assert.assertFalse(proxyItem.getClass() == Book.class);
+	Assert.assertFalse(proxyItem instanceof Book);
+	Assert.assertTrue(proxyItem instanceof Item);
+}
+```
+
+- 그런데 출력 결과를 보면 기대와는 다르게 저자가 출력되지 않은 것을 알 수 있다.
+
+### 왜 원하는 출력값 다를까?
+- 실제 조회된 엔티티는 Book이므로 Book 타입을 기반으로 원본 엔티티 인스턴스가 생성된다. 그런데 em.getReference() 메소드에서 Item 엔티티를 대상으로 조회 했으므로 프록시인 proxyItem은 Item 타입을 기반으로 만들어진다. 이런 이유로 다음 연산이 기대와 다르게 false를 반환한다. 왜냐하면 proxyItem은 Item&Proxy 타입이고 이 타입은 Book 타입과 관계가 없기 때문이다.
+- 정리하자면 다음과 같은 문제가 있다.
+```
+proxyItem instanceof Book // 1. instanceof 연산을 사용할 수 없다.
+```
+```
+Book book = (Book) proxyItem; // 2. 하위타입으로 다운캐스팅을 할 수 없다.
+```
+
+### 문제 발생 경우를 좀 더 살펴보자
+```
+@Entity
+public class OrderItem {
+	@Id @GeneratedValue
+	private Long id;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ITEM_ID")
+	private Item item;
+	
+	...
+}
+```
+
+```
+@Test
+public void 상속관계와_프록시_도메인모델() {
+	//테스트 데이터 준비
+	Book saveBook = new Book();
+	saveBook.setName("jpaBook");
+	saveBook.setAuthor("kim");
+	em.persist(saveBook);
+	
+	OrderItem saveOrderItem = new OrderItem();
+	saveOrderItem.setItem(book);
+	em.persist(saveOrderItem);
+	
+	em.flush();
+	em.clear();
+	
+	// 테스트 시작
+	OrderItem orderItem = em.find(OrderItem.class, saveOrderItem.getId());
+	Item item = orderItem.getItem();
+	
+	System.out.println("item = " + item.getClass());	// 프록시 조회
+	
+	Assert.assertFalse(item.getClass() == Book.class);
+	Assert.assertFalse(item instanceof Book);
+	Assert.assertTrue(item instanceof Item);
+	
+```
+
+### 그렇다면 상속관계에서 발생하는 프록시 문제를 어떻게 해결해야 할까?
+1. JPQL로 대상 직접 조회
+	- 하지만 이방법은 다형성을 활용할 수 없다.
+```
+Book jpqlBook = em.createQuery
+	("select b from Book b where b.id=:bookId", Book.class)
+	.setParameter("bookId", item.getId())
+	.getSingleResult();
+	
+```
+
+2. 프록시 벗기기
+```
+	...
+	Item item = orderItem.getItem();
+	Item unProxyItem = unProxy(item);
+	
+	if (unProxyItem instanceof Book) {
+		System.out.println("proxyItem instanceod Book");
+		Book book = (Book) unproxyItem;
+		System.out.println("책 저자 = " + book.getAuthor());
+	}
+	
+	Assert.assertTrue(item != unProxyItem);
+}
+
+//하이버네이트가 제공하는 프록시에서 원본 엔티티를 찾는 기능을 사용하는 메소드
+public static <T> T unProxy(Object entity){
+	if(entity instanceof HibernateProxy) {
+		entity = ((HibernateProxy) entity)
+							.getHibernateLazyInitializer()
+							.getImplementation();
+	}
+	return (T) entity;
+}
+```
+
+- 그런데 이 방법은 프록시에서 원본 엔티티를 직접 꺼내기 때문에 프록시와 원본 엔티티의 동일성 비교가 실패한다는 문제점이 있다.
+```
+item == unProxyItem // false
+```
+
