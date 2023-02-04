@@ -14,6 +14,68 @@
 - REPEATABLE READ(반복 가능한 읽기) -> PHANTOM READ 발생 : 반복 조회 시 결과 집합이 달라진다.
 - SERIALIZABLE(직렬화 가능) -> 가장 엄격한 격리 수준으로 PHANTOM READ가 발생하지 않는다.
 
+![트랜잭션 격리수준](https://user-images.githubusercontent.com/68458092/215258359-0f8d8cce-3fbf-4724-a911-38c65611e73d.jpeg)
+
+## 낙관적 락과 비관적 락 기초
+JPA 의 영속성 컨텍스트를 적절히 활용하면 READ COMMITED 커밋 격리수준이어도 REPEATABLE READ 가 가능하다.  
+JPA는 데이터베이스 트랜잭션 격리 수준을 READ COMMITED 정도로 가정한다.  
+만약 일부 로직에 더 높은 격리 수준이 필요하면 낙관적 락과 비관적 락 중 하나를 사용하면 된다.  
+
+### 낙관적 락
+트랜잭션 대부분은 충돌이 발생하지 않는다고 낙관적으로 가정하는 방법이다.  
+데이터베이스가 제공하는 락 기능을 사용하는 것이 아니라 JPA(어플리케이션) 가 제공하는 락이다.  
+커밋하기 전까지 충돌을 알 수 없다는 특징이 있다.  
+
+### 비관적 락
+이름 그대로 충돌이 발생한다고 가정하고 우선 락을 걸고 보는 방법이다.  
+데이터베이스가 제공하는 락 가능을 사용한다.  
+대표적으로 select for update 구문이 있다.  
+
+### 두 번의 갱실 분실 문제
+트랜잭션만으로 해결할 수 없는 문제로 아래 예시의 경우 3가지 선택방법이 있다.  
+ex) 사용자 A 와 B 가 동시에 게시글을 수정하게 될 경우 A 가 수정을 완료한 후 B 가 수정하게 될 경우  
+A가 수정한 내용에 B 가 덮어씌어지는 문제가 발생하게 된다.
+
+1. 마지막 커밋만 인정하기 : 사용자 A의 내용은 무시하고 마지막에 커밋한 사용자 B의 내용만 인정한다.(기본적으로 적용)
+2. 최초 커밋만 인정하기 : 사용자 A가 이미 수정을 완료했으므로 사용자 B가 수정을 완료할 때 오류가 발생한다.(JPA 버전관리 기능 사용)
+3. 충돌하는 갱신 내용 병합하기 : 사용자 A와 사용자 B의 수정사항을 병합한다.(개발자가 직접 사용자에게 병합방법을 제공해야함)
+
+## @Version
+JPA가 제공하는 낙관적 락을 사용하려면 @Version 어노테이션을 사용해서 버전 관리 기능을 추가해야 한다.  
+
+적용 가능 타입
+- Long (long)
+- Integer (int)
+- Short (short)
+- Timestamp
 
 ```Java
+@Entity
+public class Board {
+
+	@Id
+	private String id;
+	private String title;
+
+  /**
+  *   엔티티를 수정할 때 마다 자동으로 하나씩 증가한다.
+  *   엔티티를 수정할 때 조회 시점의 버전과 수정시점의 버전이 다르면 예외가 발생한다.
+  *   따라서 버전정보를 사용하면 최초 커밋만 인정하기가 적용된다.
+  */
+	@Version
+	private Integer version;
+}
 ```
+
+![@Version예제1](https://user-images.githubusercontent.com/68458092/216748540-267b87b0-ff7c-44d0-a371-45211d2db886.png)
+
+## JPA 락 사용
+JPA를 사용할 때 추천하는 전략은 READ COMMITTED 트랜잭션 격리 수준 + 낙관적 버전 관리다. (두 번의 갱신 내역 분실 문제 예방)  
+
+락은 다음 위치에 적용할 수 있다.
+- EntityManager.lock(), EntityManager.find(), EntityManager.refresh()
+- Query.setLockMode() (TypeQuery 포함)
+- @NamedQuery
+
+
+
