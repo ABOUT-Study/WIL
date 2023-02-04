@@ -345,3 +345,69 @@ public class OrderItem {
 OrderItem orderItem = em.find(OrderItem.class, saveOrderItem.getId());
 orderItem.printItem();
 ```
+
+### N+1
+- N + 1문제란?
+```
+@Entity
+public class Member {
+
+	@Id @GeneratedValue
+	private Long id;
+
+	@OneToMany(mappedBy = "member", fetch = 즉시 or )
+	private List<Order> orders = new ArrayList<Order>();
+
+	...
+}
+```
+```
+@Entity
+public class Order {
+	@Id @GeneratedValue
+	private Long id;
+
+	@ManyToOne
+	private Member member;
+	...
+}
+```
+
+```
+SELECT * FROM MEMNER
+SELECT * ORDERS WHERE MEMBER_ID =1 // 회원과 연관된 주문
+SELECT * ORDERS WHERE MEMBER_ID =2 // 회원과 연관된 주문
+SELECT * ORDERS WHERE MEMBER_ID =3 // 회원과 연관된 주문
+SELECT * ORDERS WHERE MEMBER_ID =4 // 회원과 연관된 주문
+SELECT * ORDERS WHERE MEMBER_ID =5 // 회원과 연관된 주문
+SELECT * ORDERS WHERE MEMBER_ID =6 // 회원과 연관된 주문
+```
+
+### N + 1 해결책
+1. 패치 조인을 사용하자
+	- 페치 조인은 SQL 조인을 사용해서 연관된 엔티티를 함께 조회하므로 N+1 문제가 발생하지 않는다.
+	```
+	select m from Member m join fetch m.orders
+
+	// 결과 SQL 로그
+	SELECT M.*, O.* FROM MEMBER M
+	INNER JOIN ORDERS O ON M.ID=O.MEMBER_ID
+	```
+2. 하이버네이트 @BatchSize
+	- BatchSize 어노테이션을 사용하면 연관된 엔티티를 조회할 때 지정한 size만큼 SQL의 IN절을 사용해서 조회한다. 만약 조회한 회원이 10명인데 size=5로 지정하면 2번의 SQL만 추가로 실행한다.
+	```
+	@Entity
+	public class Member {
+
+	@Id @GeneratedValue
+	private Long id;
+
+	@BatchSize(size = 5)
+	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+	private List<Order> orders = new ArrayList<Order>();
+
+	...
+	}
+	```
+	
+	- hibernate.default+batch_fetch_size 속성을 사용하면 애플리케이션 전체에 기본으로 @BatchSize를 적용할 수 있다.
