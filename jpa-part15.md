@@ -248,7 +248,7 @@ public void 상속관계와_프록시_도메인모델() {
 	System.out.println("item = " + item.getClass());	// 프록시 조회
 	
 	Assert.assertFalse(item.getClass() == Book.class);
-	Assert.assertFalse(item instanceof Book);
+	Assert.assertFalse(item instanceof Book);		// false
 	Assert.assertTrue(item instanceof Item);
 	
 ```
@@ -295,3 +295,53 @@ public static <T> T unProxy(Object entity){
 item == unProxyItem // false
 ```
 
+3. 기능을 위한 별도의 인터페이스 제공
+```
+public interface TitleView {
+	String getTitle();
+}
+
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "DTYPE")
+public abstract class Item implements TitleView {
+	@Id @GeneratedValue
+	@Column(name = "ITEM_ID")
+	private Long id;
+	
+	...
+}
+
+@Entity
+@DiscriminatorValue("B")
+public class Book extends Item() {
+	private String author;
+	private String isbn;
+	
+	@Ovverride
+	public String getTitme() {
+		return "[제목:" + getName() + "저자:" + 며쇅 + "]";
+	}
+}
+```
+
+```
+@Entity
+public class OrderItem {
+	@Id @GeneratedValue
+	private Long id;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ITEM_ID")
+	private Item item;
+	
+	...
+	
+	public void printItem() {
+		System.out.println("TITLE="+item.getTitle());
+	}
+}
+```
+```
+OrderItem orderItem = em.find(OrderItem.class, saveOrderItem.getId());
+orderItem.printItem();
+```
