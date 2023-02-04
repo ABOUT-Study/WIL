@@ -435,3 +435,76 @@ SELECT * ORDERS WHERE MEMBER_ID =6 // 회원과 연관된 주문
 	```
 	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	```
+
+### 배치
+- 수천에서 수만 건 이상의 엔티티를 한번에 등록 할 때 주의 할 점은 영속성 컨텍스트에 엔티티가 계속 쌓이지 않도록 일정 단위마다 영속성 컨텍스트의 엔티티를 데이터 베이스에 플러시 하고 영속성 컨텍스트를 초기화 해야 한다.
+
+- 등록배치
+```
+Entitymanager em = entityManagerFactory.createEntityManager();
+EntityTransaction tx = em.getTransaction();
+tx.begin();
+
+for(int i=0; i< 10000; i++){
+    Product product = new Product(“item” + i, 10000);
+    em.persist(product);
+
+    if(i % 100 == 0){
+      em.flush();
+    em.clear();
+}}
+tx.commit();
+em.close();
+```
+
+- 수정배치
+1. 페이징 처리
+```
+Entitymanager em = entityManagerFactory.createEntityManager();
+EntityTransaction tx = em.getTransaction();
+tx.begin();
+int pageSize = 100;
+for(int i=0; i< 10; i++){
+    List<Product> resultList = em.createQuery(“select p from Product p”, Product.class)
+        .setFirstResult(i * pageSize)
+        .setMaxResults(pageSize)
+        .getResultList();
+
+    for(Product product : resultList){
+        product.setProduct(product.getPrice() + 100);
+    }
+    em.flush();
+    em.clear();
+}}
+tx.commit();
+em.close();
+```
+
+2. 하이버네이트 scroll 사용
+- 하이버네이트는 scroll이라는 이름으로 JDBC 커서를 지원한다.
+```
+EntityTransaction tx = em.getTransaction();
+Session session = em.unwrap(Session.class);
+
+tx.begin();
+ScrollableResults scroll = session.createQuery("select p from Product p")
+																		.setCacheMode.IGNORE) // 2차 캐시 기능을 끈다
+																		.scroll(ScrollMode.FORWARD_ONLY);
+
+int count = 0;
+
+while (scroll.next()) {
+	Product p = (Product) scroll.get(0);
+	p.setPrice(p.getPrice() + 100);
+
+	count++;
+	if(count % 100 ==0) {
+		session.flush(); // 플러시
+		session.clear(); // 영속성 컨텍스트 초기화
+	}
+}
+
+tx.commit();
+session.close();
+```
+- scroll은 하이버네이트 전용 기능이므로 먼저 em.unwrap() 메소드를 사용해서 하이버네이트 세션을 구한다. 다음으로 쿼리를 조회하면서 scroll() 메소드로 ScrollableResults 객체를 반환받는다. 이 객체의 next() 메소드를 호출하면 엔티티를 하나씩 조회할 수 있다.
