@@ -411,3 +411,27 @@ SELECT * ORDERS WHERE MEMBER_ID =6 // 회원과 연관된 주문
 	```
 	
 	- hibernate.default+batch_fetch_size 속성을 사용하면 애플리케이션 전체에 기본으로 @BatchSize를 적용할 수 있다.
+
+
+### 성능 최적화
+- 엔티티가 영속성 컨텍스트에 관리되면 1차 캐시부터 변경 감지까지 얻을 수 있는 혜택이 많다. 하지만 영속성 컨텍스트는 변경 감지를 위해 스냅샷 인스턴스를 보관하므로 더 많은 메모리를 사용하는 단점이 있다. 이때는 읽기 전용으로 엔티티를 조회하면 메모리 사용량을 최적화 할 수 있다.
+1. 스칼라 타입으로 조회
+	- 스칼라 타입은 영속성 컨텍스트가 결과를 관리 하지 않는다.
+	```
+	select o.id, o.name, o.price from Order p(변경 후)
+	```
+2. 읽기 전용 쿼리 힌트 사용
+	- 하이버네이트 전용 힌트인 org.hibernate.readOnly를 사용하면 엔티티를 읽기 전용(스냅샷 보관 안함)으로 조회 할 수 있다. 메모리 절약 측면에서 이득.
+	```
+	TypedQuery<Order> query = em.createQuery(“select o from Order o”, Order.class);
+	query.setHint(“org.hibernate.readOnly”, true);
+3. 읽기 전용 트랜잭션 사용
+	- 트랜잭션에 readOnly=true 옵션을 주면 강제로 플러시를 호출하지 않는 한 플러시가 일어나지 않는다. 영속성 컨텍스트를 플러시 하지 않으니 엔티티의 등록, 수정, 삭제 할 때 일어나는 스냅샵 비교와 같은 무거운 로직들을 수행 하지 않으므로 성능이 향상 된다.
+	```
+	@Transactional(readOnly=true)
+	```
+4. 트랜잭션 밖에서 읽기
+	- 트랜잭션 밖에서 읽는다는 것은 트랜잭션 없이 엔티티를 조회 한다는 뜻이다. 트랜잭션을 사용하지 않으면 플러시가 일어나지 않으므로 조회 성능이 향상된다.
+	```
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	```
