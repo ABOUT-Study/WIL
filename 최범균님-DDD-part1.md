@@ -51,8 +51,33 @@
 
 <img width="370" alt="image" src="https://user-images.githubusercontent.com/20812458/216753848-ca71d159-72c2-42a5-a239-a68d5bdcf430.png">   
 
-응용 서비스는 로직을 
-ㅈㅣㄱ접 
-ㅈㅣㄱ접 수행하기보다는 도메인 
+응용 서비스는 로직을 직접 수행하기 보다는 도메인 모델에 로직 수행을 위임한다. 위 코드도 주문 취소 로직을 직접 구현하지 않고 Order 객체에 취소 처리를 위임하고 있다.   
 
+<img width="343" alt="image" src="https://user-images.githubusercontent.com/20812458/216753902-ec2ad86a-bc7e-4026-971e-0c41a0a8b798.png">
 
+응용 영역은 도메인 모델을 이용해서 사용자에게 제공할 기능을 구현한다. 실제 도메인 로직 구현은 도메인 모델에 위임한다.   
+   
+인프라스트럭처 영역은 논리적인 개념을 표현하기 보다는 실제 구현을 다룬다.
+
+<img width="367" alt="image" src="https://user-images.githubusercontent.com/20812458/216755442-a203e802-1b85-432f-a76a-89dc9ab28145.png">   
+
+개발을 하다보면 도메인은 인프라스트럭처에 의존을 하게 된다 하지만 이 방식은 좋지 않아 아래와 같은 방법으로 인터페이스를 중간에 두어 고수준과 저수준을 나누어서 관리를 하게 된다.   
+<img width="429" alt="image" src="https://user-images.githubusercontent.com/20812458/216755905-120c2511-e83c-4ff7-a2b6-36e3f7f42855.png">   
+<img width="418" alt="image" src="https://user-images.githubusercontent.com/20812458/216755910-f31a609f-0a44-46ba-a26c-2f7bee941892.png">   
+<img width="373" alt="image" src="https://user-images.githubusercontent.com/20812458/216755915-2fee808c-1619-46d8-942f-6e5fe50ee8ff.png">   
+
+이러한 것을 DIP라고 한다 저수준 모듈이 고수준 모듈에 읜존하도록 변경하는 것이다.   
+   
+<img width="301" alt="image" src="https://user-images.githubusercontent.com/20812458/216756028-e49ae016-3b82-42d2-bb39-464327adef58.png">   
+   
+DIP는 항상 적용할 필요는 없다. 사용하는 구현 기술에 따라 완벽한 DIP를 적용하기보다는 구현 기술에 의존적인 코드를 도메인에 일부 포함하는게 효과적일 때도 있다.   
+
+아래는 잘못된 예를 보여준다. 인터페이스와 구현 클래스를 분리하는게 DIP는 아니다.   
+
+<img width="426" alt="image" src="https://user-images.githubusercontent.com/20812458/216756224-c69ba87f-fbf7-4aa5-8661-8b3554dbf39b.png">   
+   
+RuleEngine인터페이스는 고수준 모듈인 도메인 관점이 아니라 룰 엔진이라는 저수준 모듈 관점에서 도출되어있다. 이것은 DIP가 아니다.   
+
+예를들어 할인금액계산을 토대로 만들어진다면 밑에와 같은 그림이 되어야 한다.   
+
+<img width="377" alt="image" src="https://user-images.githubusercontent.com/20812458/216756286-0418e32a-0e4a-48ac-84ef-323d8877f505.png">   
