@@ -418,7 +418,7 @@ SELECT * ORDERS WHERE MEMBER_ID =6 // 회원과 연관된 주문
 1. 스칼라 타입으로 조회
 	- 스칼라 타입은 영속성 컨텍스트가 결과를 관리 하지 않는다.
 	```
-	select o.id, o.name, o.price from Order p(변경 후)
+	select o.id, o.name, o.price from Order p
 	```
 2. 읽기 전용 쿼리 힌트 사용
 	- 하이버네이트 전용 힌트인 org.hibernate.readOnly를 사용하면 엔티티를 읽기 전용(스냅샷 보관 안함)으로 조회 할 수 있다. 메모리 절약 측면에서 이득.
