@@ -429,3 +429,187 @@ List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.cl
 ```
 
 - **NamedQuery는 Spring Data JPA의 @Query와 비슷하게 동작한다. 실무에서는 Spring Data JPA를 쓸테니 @Query를 훨씬더 많이 사용한다.**
+
+## QueryDSL
+
+JPA Criteria 처럼 JPQL 빌더 역할을 하는데 더 쉽고 간결하고 모양도 쿼리와 비슷하게 개발할 수 있다.
+
+또한 문자가 아닌 코드로 JPQL을 작성하므로 문법오류를 컴파일 단계에서 잡을 수 있고 IDE 자동완성 기능의 도움을 받을 수 있는 등의 장점이 있다.
+
+JPA, JDO, JDBC, Lucene, Hibernate, Search, 몽고DB, 자바 컬렉션 등 다양하게 지원한다.
+
+### 사용하기
+
+- JPAQuery 객체를 생성해야 하는데 이때 생성자에 엔티티매니저를 넘겨준다.
+
+  JPAQuery query = new JPAQuery(em);
+
+- Q생성 (같은 엔티티를 사용할 경우 별칭이 겹치므로 지정해줘야한다)
+
+  QMember member = QMember.member; // 기본 인스턴스 사용
+
+  QMember member = new QMember("m"); // 직접지정
+
+### 검색 조건 쿼리
+
+~~~java
+List<Item> list = query.from(item)
+			.where(item.name.eq("좋은상품").and(item.price.gt(20000)))
+			.list(item); // 조회할 프로젝션 지정
+select item
+from Item item
+where item.name = ?1 and item.prive > ?2
+
+// where 절에 and 나 or 사용 가능
+// and 조건으로 다음과 같이 사용가능 -> .where(item.name.eq("좋은상품"), item.price.gt(20000))
+
+~~~
+
+### 결과 조회
+
+쿼리 작성이 끝나고 결과 조회 메소드를 호출하면 실제 데이터베이스를 조회한다.
+
+JPAQuery 대표적인 결과 조회 메소드
+
+- uniqueRsult() : 조회결과가 1건일때 사용 (결과가 없으면 null, 1건 이상이면 Exception 발생)
+- singleResult() : 결과가 1건 이상이면 처음 데이터를 반환
+- list() : 결과가 1건 이상일때 사용 (결과가 없으면 빈 컬렉션 반환)
+
+### 페이징과 정렬
+
+```java
+SearchResults<Item> result = query.from(item)
+				.where(item.price.gt(10000))
+				.offset(10).limit(20)
+				.listResults(item);
+long totla = result.getTotal(); // 검색된 전체 데이터 수
+long limit = result.getLimit();
+long offset = result.getOffset();
+List<Item> results = result.getResults(); // 조회된 데이터
+// listResults() 사용시 전체 데이터 조회를 위한 count 쿼리를 한번 더 실행한다.
+```
+
+### 그룹
+
+~~~java
+query.from(item)
+	.groupBy(item.price) // 그룹화
+	.having(item.price.gt(1000)) // 그룹화 제한
+	.list(item);
+~~~
+
+### 조인
+
+innerJoin(join), leftJoin, rightJoin, fullJoin 추가로 on, fetch 조인 사용 가능
+
+~~~java
+query.from(order)
+	.join(order.member, member) // 2번째는 별칭
+	.fetch() // select 함께 하며 영속성도 포함
+	.leftJoin(order.orderItems, orderItem)
+	.on(orderItem.count.gt(2))		
+	.list(order);
+		
+// from 절에 여러개를 사용하는 세타 조인
+query.from(order, member)
+		.where(order.member.eq(member))
+		.list(order);
+~~~
+
+### 서브 쿼리
+
+JPASubQuery를 생성해서 사용
+
+~~~java
+QItem item = QItem.item;
+QItem. itemSub = new QItem("itemSub");
+
+query.from(item)
+	.where(item.price.eq(
+		new JPASubQuery().from(itemSub)
+				.where(item.name.eq(itemSub.name))
+				.list(itemSub) // 단건일 경우 unique() 사용
+	))
+	.list();
+~~~
+
+### 프로젝션과 결과 반환
+
+select 절에 조회 대상을 지정하는 것을 프로젝션이라 한다.
+
+~~~java
+QItem item = QItem.item;
+List<String> result = query.from(item).list(item.name);
+
+// 필드가 여러개일 경우 Tuple 이라는 Map 과 비슷한 내부 타입을 사용한다.
+List<Tuple> result = query.from(item).list(item.name, item.price);
+
+for (Tuple tuple : result) {
+	System.out.println("name = " + tuple.get(item.name));
+  System.out.println("price = " + tuple.get(item.price));
+}
+
+// 엔티티가 아닌 특정 객체로 받고 싶을 경우 빈생성 기능을 사용한다.
+// 1. 프로퍼티 접근(Setter)
+List<ItemDTO> result = query.from(item).list(
+	Projections.bean(ItemDTO.class, item.name.as("username"), item.price)
+);
+// 2. 필드 직접 접근
+List<ItemDTO> result = query.from(item).list(
+	Projections.fields(ItemDTO.class, item.name.as("username"), item.price)
+);
+// 3. 생성자 사용
+List<ItemDTO> result = query.from(item).list(
+	Projections.constructor(ItemDTO.class, item.name, item.price)
+);
+~~~
+
+ ### 수정, 삭제 배치 쿼리 & 동적 쿼리 & 메소드 위임
+
+~~~java
+// 수정
+JPAUpdateClause updateClause = new JPAUpdateClause(em, item);
+long count = updateClause.where(item.name.eq("JPA책"))
+  			.set(item.price, item.price.add(100))
+  			.execute();
+// 삭제
+QItem item = QItem.item;
+JPADeleteCluase deleteClause = new JPADeleteCluase(em, item);
+long count = deleteClause.where(item.name.eq("JPA책")).excute();
+// 동적 쿼리
+SearchParam param = new SearchParam();
+param.setName("개발자");
+param.setPrice(10000);
+QItem item = QItem.item;
+BooleanBuilder builder = new BooleanBuilder();
+if (StringUtils.hasText(param.getName())) {
+  builder.and(item.name.contains(param.getName()));
+}
+List<Item> result = query.from(item)
+  			.where(builder)
+  			.list(item);
+// 메소드 위임
+public class ItemExpression {
+  @QueryDelegate(Item.class) // 해당 어노테이션에 적용할 엔티티를 지정
+  public static BooleanExpression isExpensive (QItem item, Integer price) {
+    return item.price.gt(price);
+  }
+}
+// Q클래스에 기능이 추가 됨
+public class QItem extends EntityPathBase<Item> {
+  ...
+  public com.mysema.query.types.expr.BooleanExpression isExpensive(Integer price) {
+    return ItemExpression.isExpensive(this, price);
+  }
+}
+// 메소드 위임 기능 사용
+query.from(item).where(item.isExpensive(30000)).list(item);
+~~~
+
+책에는 JPAQuery 에 대한 설명이 나와있지만 JPAQueryFactory 사용을 더 많이 함 (아래는 김영한님의 댓글)
+
+JPAQueryFactory는 select 절 부터 적을 수 있게 도와줍니다^^ 반면에 JPAQuery는 그렇지 못하지요.
+그리고 객체의 생성을 직접 NEW 하는 것 보다는 팩토리를 통해서 생성하면, 향후에 구현 클래스가 변경되어도 해당 코드를 사용하는 클라이언트 코드는 손대지 않아도 되는 장점이 있습니다.
+성능은 차이가 없다고 보시면 됩니다.
+
+JPAQueryFactory 설명 출처 : https://joont92.github.io/jpa/QueryDSL
