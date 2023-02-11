@@ -94,10 +94,44 @@ RuleEngine인터페이스는 고수준 모듈인 도메인 관점이 아니라 �
 |리포지토리 REPOSITORY|도메인 모델의 영속성을 처리한다. 예를 들어 DBMS 테이블에서 엔티티 객체를 호스팅하거나 저장하는 기능을 제공한다.|
 |도메인 서비스 DOMAIN SERVICE|특정 엔티티에 속하지 않은 도메인 로직을 제공한다. '할인 금액 계산'은 상품, 쿠폰, 회원 등급, 구매 금액등 다양한 조건을 이용해서 구현하게 되는데. 이렇게 도메인 로직이 여러 엔티티와 밸류를 필요로 하면 도메인 서비스에서 로직을 구현한다.|
 
+## 요청 처리 흐름
+스프링 MVC로 만들었다면 요청을 받아서 service repository를 만들고 데이터를 가져와 변경을 했을것이다.   
+밑의 그림은 해당 로직을 좀 더 도메인의 중점에 맞게 그린것이다.
+![image](https://user-images.githubusercontent.com/20812458/218251723-78dda9da-ffac-4f51-8564-232d0cbedcd4.png)
 
 
+## 인프라스트럭처 개요
+infrastructure는 표현 영역, 응용 영역, 도메인 영역을 지원한다.   
+   - 도메인 객체의 영속성 처리, 트랜잭션, SMTP 클라이언트, REST 클라이언트 등 다른 영역에서 필요로 하는 프레임워크, 구현 기술, 보조 기능을 지원
 
+DIP를 통해 infrastructure 기능을 직접 사용하는 것 보다 추상화된 인터페이스의 구현 객체를 활용하는 것이 시스템을 더 유연하고 테스트하기 쉽게 만들어준다.
+   - 다만, 무조건 infrastructure에 대한 의존을 없애는 것은 좋은 것이 아니다.
+   - 예를 들어 스프링을 사용한다면 트랜잭선 처리를 위해 스프링이 제공하는 @Transactional을 사용하는 것이 편리하다.
+   - 또 하나로 JPA를 사용한다면 편리하게 사용하기 위해 @Table과 같은 어노테이션을 사용하는게 좋다. 이걸 안한다면 mapper을 이용해서 하나하나 다 맵핑을 해야 한다.
 
+## 모듈 구성
+패키지를 구성하는데에는 정답이 존재하지 않는다. 이책에서 사용하는 패키지의 구성은 아래와 같다.   
+
+![image](https://user-images.githubusercontent.com/20812458/218252196-ea001b64-2f0e-4ff7-84dd-f5fdc3f7f8e6.png)   
+도메인이 크면 밑에와 같이 하위 도메인을 나누고 각 하위 도메인마다 별도 패키지를 구성한다.   
+   
+![image](https://user-images.githubusercontent.com/20812458/218252077-29c8d61e-96a5-4931-85cc-28d8f9097738.png)   
+
+![image](https://user-images.githubusercontent.com/20812458/218252119-0c9030f3-3bda-4e61-8839-827aebe6a12a.png)   
+위의 그림은 카탈로그 하위 도메인이 상품 애그리거트와 카테고리 애그리거트로 구성될 경우 도메인을 두 개의 하위 패키지로 구성할 수 있다.   
+   
+애그리거트, 모델, 리포지터리는 같은 패키지에 위치시킨다. 예를 들어 주문과 관련된 Order, OrderLine, Orderer, OrderRepository 등은 com.myshop.order.domain 패키지에 위치 시킨다.   
+   
+도메인이복잡하면 도메인모델과도메인서비스를다음과 같이 별도패키지에 위치시킬 수도 있다.
+   - com.myshop.order.domain.order: 애그리거트 위치
+   - com.myshop.order.domain.service: 도메인 서비스 위치
+   
+응용서비스도다음과 같이도메인별로패키지를 구분할 수 있다.   
+   - com.myshop.catalog.application.product
+   - com.myshop.catalog.application.category
+   
+모듈 구조를 얼마나 세분화해야 하는지에 대해 정해진 규칙은 없다. 한 패키지에 너무 많은 타입이 몰려서 코드를 찾을 때 불편한 정도만 아니면 된다.   
+개인적으로는 한 패키지에 가능하면 10~15개 미만으로 타입 개수를 유지하려고 노력한다. 이 개수가 넘어가면 패키지를 분리하는 시도를 해본다.
 
 
 
