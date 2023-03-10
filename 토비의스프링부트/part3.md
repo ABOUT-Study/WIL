@@ -1,13 +1,19 @@
-## Been 구성 정보
-
+## 빈 오브젝트와 역할과 구분
+### 크게 스프링 컨테이너가 생성하고 관리하는 빈들을 어플리케이션 빈과 컨테이너 인프라스트럭처 빈으로 나눔
+- 어플리케이션 빈 : 개발자가 어떤 빈을 사용하겠다고 명시적으로 구성정보를 제공한것
+- 컨테이너 인프라스트럭처 빈 : 스프링 컨테이너 자신이거나 스프링컨테이너가 확장하면서 추가한 빈들
+  
 ![Been 구성 정보1](https://user-images.githubusercontent.com/68458092/221560969-01515f7d-50e5-487e-84b0-4f550c8abc53.jpeg)
-
+- 애플리케이션 로직 빈 : 서비스 로직이 담겨져있는 빈
+- 애플리케이션 인프라스트럭처 빈 : 만들어져 있는 기능을 사용하기 위해 구성정보를 작성해서 사용하는 빈
+  
 ![Been 구성 정보2](https://user-images.githubusercontent.com/68458092/221561068-6d7d624a-ce6e-48df-8fcb-225619851e77.jpeg)
-
+- 스프링부트에서 기본적으로 있어야 하는 빈이지만 애플리케이션 인프라스트럭처 빈인 이유는 명시적으로 선언을 해줘야지만 빈으로 등록되고 사용됨
+  
 ![Been 구성 정보3](https://user-images.githubusercontent.com/68458092/221561157-12401039-35ed-4369-8389-5376cd150a39.jpeg)
 
 
-## Auto Configuration
+## Auto Configuration (자동 구성정보는 어떤 방식으로 이루어지는가?)
 
 Import 를 사용해서 WebServer 와 DispatcherServlet Been 등록을 분리하고  
 EnableMyAutoConfiguration 을 추가해 Auto Configuration 을 구성
@@ -45,6 +51,9 @@ public @interface MySpringBootApplication {
 
 ![AutoConfiguration 구성](https://user-images.githubusercontent.com/68458092/221560795-ee88f1a2-f393-4352-ac70-eaf506a42cca.jpeg)
 
+- EnableMyAutoConfiguration 에 정적으로 Import를 추가했던 코드를 ImportSelector 인터페이스를 이용해 동적으로 변경
+- 아래에선 ImportSelector 를 확장한 DeferredImportSelector 를 사용
+  
 ```Java
 public class MyAutoConfigImportSelector implements DeferredImportSelector {
     private final ClassLoader classLoader;
@@ -69,6 +78,10 @@ public class MyAutoConfigImportSelector implements DeferredImportSelector {
     }
 }
 ```
+
+  
+  ![ImportSelector경로 그림](https://user-images.githubusercontent.com/68458092/224325465-ccd388b3-c701-43ef-b352-d532aab49b8f.png)
+  
 
 ## @Configuration(proxyBeanMethods = false) 옵션
 ```Java
