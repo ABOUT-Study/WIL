@@ -99,8 +99,9 @@ public class TomcatWebServerConfig {
 ![스크린샷 2023-03-21 오후 10 06 00](https://user-images.githubusercontent.com/68458092/226623613-0b27e959-4af5-4667-a62b-4b81f0bf883d.png)
 
 ```Java
+// Environment 에 property 들이 담겨져 있는데 우선순위가 있다.
 @Bean("tomcatWebServerFactory")
-@ConditionalOnMissingBean // 메서드레벨에서 해당 빈이 등록이 되어있으면 무시하고 등록되지않으면 아래 빈을 등록시킴
+@ConditionalOnMissingBean
 public ServletWebServerFactory servletWebServerFactory(Environment env) {
     TomcatServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
     serverFactory.setContextPath(env.getProperty("contextPath"));
@@ -111,4 +112,34 @@ apllication.properties 파일
 contextPath=/app  3순위
 ```
 ![스크린샷 2023-03-21 오후 10 48 05](https://user-images.githubusercontent.com/68458092/226627224-0c96fc96-2584-41be-b109-66ea7010d2f4.png)
+
+### 위에서 Environment 에서 직접 프로퍼티를 가져오는 코드를 리팩토링
+
+```Java
+@Bean("tomcatWebServerFactory")
+@ConditionalOnMissingBean
+public ServletWebServerFactory servletWebServerFactory(Environment env) {
+
+    // 원래 @Value 를 그냥 사용하면 안됨 (스프링컨테이너의 기본 동작 방식이 아님)
+    // 스프링컨테이너를 확장해서 기능을 추가해줘야함 => PropertySourcesPlaceholderConfigurer
+    @Value("${contextPath}")
+    String contextPath;
+    
+    TomcatServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+    serverFactory.setContextPath(this.contextPath);
+    return serverFactory;
+}
+
+@MyAutoConfiguration
+public class PropertyPlaceholderConfig {
+
+    // BeanFactoryPostProcessor >> 시간이 지나며 이걸 확장해서 만들어진게 PropertySourcesPlaceholderConfigurer
+    // Been 정보를 모은 다음 후처리기(어떤 프로세서가 진행되는 중간과정에 후킹해 들어가 부가작업)
+    // 스프링컨테이너의 확장 포인터
+    @Bean
+    PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+}
+```
 
