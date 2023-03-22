@@ -143,3 +143,4 @@ public class PropertyPlaceholderConfig {
 }
 ```
 
+### 위 방식도 좋지 않아 보임 프로퍼티 값이 많아지면 검증&재사용 등이 용이하지 못함
