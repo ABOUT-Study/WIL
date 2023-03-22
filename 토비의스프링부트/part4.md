@@ -95,6 +95,7 @@ public class TomcatWebServerConfig {
 ![스크린샷 2023-03-21 오후 10 05 00](https://user-images.githubusercontent.com/68458092/226622223-6d40ba6d-e773-4ddb-9ba4-fbe0219f369e.png)
 - 각 설정 방법들은 우선순위가 있다.
 - StandardServeletEnvironment > StandardEnvironment > @PropertiesSource > SpringBoot
+
 ![스크린샷 2023-03-21 오후 10 06 00](https://user-images.githubusercontent.com/68458092/226623613-0b27e959-4af5-4667-a62b-4b81f0bf883d.png)
 
 ```Java
