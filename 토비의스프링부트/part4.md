@@ -30,6 +30,7 @@ public class JettyWebServerConfig {
 ![@Conditional](https://user-images.githubusercontent.com/68458092/224332339-a762bf44-d579-4b72-aaaa-dc31adabfa19.png)
   
 - @Conditional 을 직접 사용하는 대신 공통적으로 사용되는 부분을 메타어노테이션을 사용해 공통화
+- matches 를 매번 구현하는게 아니라 @ConditionalMyOnClass 에 해당 하는 클래스 경로만 넣으면 되도록 변경
 ```Java
 public class MyOnClassConditional implements Condition {
     @Override
