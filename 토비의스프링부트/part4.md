@@ -173,6 +173,71 @@ public class ServerPropertiesConfig {
         return Binder.get(environment).bind("", ServerProperties.class).get();
     }
 }
-```
 
-### 위 방식도 좋지 않아 보임 프로퍼티 값이 많아지면 검증&재사용 등이 용이하지 못함
+@MyAutoConfiguration
+public class ServerPropertiesConfig {
+    @Bean
+    ServerProperties serverProperties(Environment environment) {
+        // Binder 해당 클래스 setter 네임에 맞춰서 자동 바인딩 해줌
+        return Binder.get(environment).bind("", ServerProperties.class).get();
+    }
+}
+
+>>> 위 방법도 프로퍼티 값이 많아지면 검증&재사용이 어려워지기 때문에 추가 수정
+
+@MyAutoConfiguration
+@ConditionalMyOnClass("org.apache.catalina.startup.Tomcat")
+@EnableMyConfigurationProperties(ServerProperties.class) // import 역활
+public class TomcatWebServerConfig {
+    ...
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Import(MyConfigurationPropertiesImportSelector.class)
+public @interface EnableMyConfigurationProperties {
+    Class<?> value();
+}
+
+public class MyConfigurationPropertiesImportSelector implements DeferredImportSelector {
+    @Override
+    public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+        MultiValueMap<String, Object> attr = importingClassMetadata.getAllAnnotationAttributes(EnableMyConfigurationProperties.class.getName());
+        Class propertyClass = (Class) attr.getFirst("value");
+        return new String[]{propertyClass.getName()};
+    }
+}
+
+@MyConfigurationProperties(prefix = "server")
+public class ServerProperties {
+    private String contextPath;
+    private int port;
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Component
+public @interface MyConfigurationProperties {
+    String prefix();
+}
+
+@MyAutoConfiguration
+public class PropertyPostProcessorConfig {
+    @Bean
+    BeanPostProcessor propertyPostProcessor(Environment env) {
+        return new BeanPostProcessor() {
+            @Override
+            public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+                MyConfigurationProperties annotation = AnnotationUtils.findAnnotation(bean.getClass(), MyConfigurationProperties.class);
+                if (annotation == null) return bean;
+
+                Map<String, Object> annotationAttributes = AnnotationUtils.getAnnotationAttributes(annotation);
+                String prefix = (String) annotationAttributes.get("prefix");
+
+                return Binder.get(env).bindOrCreate(prefix, bean.getClass());
+            }
+        };
+    }
+}
+
+```
